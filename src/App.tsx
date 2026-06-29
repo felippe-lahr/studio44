@@ -15,9 +15,9 @@ import {
  * pelos seus próprios assets quando quiser.
  * ------------------------------------------------------------------ */
 const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1400&auto=format&fit=crop';
+  'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2400&auto=format&fit=crop';
 const SECTION2_IMAGE =
-  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1400&auto=format&fit=crop';
+  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2400&auto=format&fit=crop';
 const SECTION3_IMG1 =
   'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1000&auto=format&fit=crop';
 const SECTION3_IMG2 =
@@ -106,11 +106,15 @@ function useMaskPositions(
   return positions;
 }
 
+type CoverSize = { renderW: number; renderH: number };
+
 /**
- * Carrega a imagem e devolve a largura que ela teria se fosse escalada
- * para preencher a altura da seção.
+ * Carrega a imagem e devolve as dimensões renderizadas usando lógica de
+ * "cover": escala pelo MAIOR dos dois fatores (largura/altura) para que a
+ * imagem cubra toda a seção, independente da proporção. Assim nenhuma
+ * imagem (mesmo quase quadrada) deixa faixas brancas em telas largas.
  */
-function useImageWidth(src: string, sectionHeight: number): number {
+function useCoverImage(src: string, sectionWidth: number, sectionHeight: number): CoverSize {
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
 
   useEffect(() => {
@@ -119,15 +123,20 @@ function useImageWidth(src: string, sectionHeight: number): number {
     img.src = src;
   }, [src]);
 
-  if (!natural || sectionHeight === 0) return 0;
-  return natural.w * (sectionHeight / natural.h);
+  if (!natural || sectionWidth === 0 || sectionHeight === 0) {
+    return { renderW: 0, renderH: 0 };
+  }
+  const scale = Math.max(sectionWidth / natural.w, sectionHeight / natural.h);
+  return { renderW: natural.w * scale, renderH: natural.h * scale };
 }
 
 type MaskedCardProps = {
   bgImage: string;
   position?: MaskPosition;
-  imageWidth: number;
+  renderW: number;
+  renderH: number;
   focalX: number;
+  focalY?: number;
   className?: string;
   children?: ReactNode;
   cardRef?: Ref<HTMLDivElement>;
@@ -137,16 +146,20 @@ type MaskedCardProps = {
 function MaskedCard({
   bgImage,
   position,
-  imageWidth,
+  renderW,
+  renderH,
   focalX,
+  focalY = 0.5,
   className = '',
   children,
   cardRef,
   style,
 }: MaskedCardProps) {
   const pos = position ?? { x: 0, y: 0, sw: 0, sh: 0 };
-  const overflow = imageWidth > pos.sw ? imageWidth - pos.sw : 0;
-  const focalOffset = overflow * focalX;
+  const overflowX = renderW > pos.sw ? renderW - pos.sw : 0;
+  const overflowY = renderH > pos.sh ? renderH - pos.sh : 0;
+  const focalOffsetX = overflowX * focalX;
+  const focalOffsetY = overflowY * focalY;
 
   return (
     <div
@@ -154,8 +167,8 @@ function MaskedCard({
       className={className}
       style={{
         backgroundImage: `url(${bgImage})`,
-        backgroundSize: `auto ${pos.sh}px`,
-        backgroundPosition: `-${pos.x + focalOffset}px -${pos.y}px`,
+        backgroundSize: `${renderW}px ${renderH}px`,
+        backgroundPosition: `-${pos.x + focalOffsetX}px -${pos.y + focalOffsetY}px`,
         backgroundRepeat: 'no-repeat',
         ...style,
       }}
@@ -183,11 +196,15 @@ function useIsMobile(): boolean {
   return isMobile;
 }
 
-function useStaggeredReveal(_count: number, threshold = 0.15) {
+function useStaggeredReveal(_count: number, active = true, threshold = 0.15) {
   const containerRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // Só observamos depois que `active` é true (ex.: após o splash desmontar).
+    // O IntersectionObserver dispara um callback inicial ao chamar observe();
+    // por isso só marcamos visible quando entry.isIntersecting for true.
+    if (!active) return;
     const el = containerRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
@@ -201,7 +218,7 @@ function useStaggeredReveal(_count: number, threshold = 0.15) {
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [threshold]);
+  }, [active, threshold]);
 
   const getAnimStyle = (index: number): CSSProperties => ({
     opacity: visible ? 1 : 0,
@@ -218,6 +235,15 @@ function useStaggeredReveal(_count: number, threshold = 0.15) {
 function SplashScreen({ onComplete }: { onComplete: () => void }) {
   const [count, setCount] = useState(0);
   const [exiting, setExiting] = useState(false);
+
+  // Trava o scroll enquanto o splash cobre a tela e SEMPRE restaura ao
+  // desmontar — garante que body.overflow volte a '' depois do load.
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   useEffect(() => {
     let current = 0;
@@ -379,15 +405,16 @@ function Navbar() {
 /* ------------------------------------------------------------------ *
  * SECTION 1 — HERO
  * ------------------------------------------------------------------ */
-function Section1() {
+function Section1({ ready }: { ready: boolean }) {
   const isMobile = useIsMobile();
   const section1Ref = useRef<HTMLElement>(null);
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
-  const s1Reveal = useStaggeredReveal(4);
+  const s1Reveal = useStaggeredReveal(4, ready);
 
   const positions = useMaskPositions(section1Ref, cardRefs);
+  const sectionWidth = positions[0]?.sw ?? 0;
   const sectionHeight = positions[0]?.sh ?? 0;
-  const imageWidth = useImageWidth(HERO_IMAGE, sectionHeight);
+  const { renderW, renderH } = useCoverImage(HERO_IMAGE, sectionWidth, sectionHeight);
   const focalX = isMobile ? 0.7 : 0.8;
 
   return (
@@ -401,7 +428,8 @@ function Section1() {
           key={bar}
           bgImage={HERO_IMAGE}
           position={positions[i]}
-          imageWidth={imageWidth}
+          renderW={renderW}
+          renderH={renderH}
           focalX={focalX}
           cardRef={(el) => (cardRefs.current[i] = el)}
           style={s1Reveal.getAnimStyle(i)}
@@ -417,7 +445,8 @@ function Section1() {
       <MaskedCard
         bgImage={HERO_IMAGE}
         position={positions[3]}
-        imageWidth={imageWidth}
+        renderW={renderW}
+        renderH={renderH}
         focalX={focalX}
         cardRef={(el) => (cardRefs.current[3] = el)}
         style={s1Reveal.getAnimStyle(3)}
@@ -454,15 +483,16 @@ function Section1() {
 /* ------------------------------------------------------------------ *
  * SECTION 2 — SERVIÇOS / PORTFÓLIO
  * ------------------------------------------------------------------ */
-function Section2() {
+function Section2({ ready }: { ready: boolean }) {
   const isMobile = useIsMobile();
   const section2Ref = useRef<HTMLElement>(null);
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
-  const s2Reveal = useStaggeredReveal(4);
+  const s2Reveal = useStaggeredReveal(4, ready);
 
   const positions = useMaskPositions(section2Ref, cardRefs);
+  const sectionWidth = positions[0]?.sw ?? 0;
   const sectionHeight = positions[0]?.sh ?? 0;
-  const imageWidth = useImageWidth(SECTION2_IMAGE, sectionHeight);
+  const { renderW, renderH } = useCoverImage(SECTION2_IMAGE, sectionWidth, sectionHeight);
   const focalX = isMobile ? 0.65 : 0.8;
 
   return (
@@ -475,7 +505,8 @@ function Section2() {
         <MaskedCard
           bgImage={SECTION2_IMAGE}
           position={positions[0]}
-          imageWidth={imageWidth}
+          renderW={renderW}
+          renderH={renderH}
           focalX={focalX}
           cardRef={(el) => (cardRefs.current[0] = el)}
           style={s2Reveal.getAnimStyle(0)}
@@ -493,7 +524,8 @@ function Section2() {
         <MaskedCard
           bgImage={SECTION2_IMAGE}
           position={positions[1]}
-          imageWidth={imageWidth}
+          renderW={renderW}
+          renderH={renderH}
           focalX={focalX}
           cardRef={(el) => (cardRefs.current[1] = el)}
           style={s2Reveal.getAnimStyle(1)}
@@ -516,7 +548,8 @@ function Section2() {
         <MaskedCard
           bgImage={SECTION2_IMAGE}
           position={positions[2]}
-          imageWidth={imageWidth}
+          renderW={renderW}
+          renderH={renderH}
           focalX={focalX}
           cardRef={(el) => (cardRefs.current[2] = el)}
           style={s2Reveal.getAnimStyle(2)}
@@ -533,7 +566,8 @@ function Section2() {
         <MaskedCard
           bgImage={SECTION2_IMAGE}
           position={positions[3]}
-          imageWidth={imageWidth}
+          renderW={renderW}
+          renderH={renderH}
           focalX={focalX}
           cardRef={(el) => (cardRefs.current[3] = el)}
           style={s2Reveal.getAnimStyle(3)}
@@ -595,8 +629,8 @@ function ArrowIcon({ className = '' }: { className?: string }) {
   );
 }
 
-function Section3() {
-  const s3Reveal = useStaggeredReveal(4);
+function Section3({ ready }: { ready: boolean }) {
+  const s3Reveal = useStaggeredReveal(4, ready);
 
   return (
     <section
@@ -722,9 +756,9 @@ export default function App() {
     <div className="bg-white">
       {showSplash && <SplashScreen onComplete={handleComplete} />}
       <Navbar />
-      <Section1 />
-      <Section2 />
-      <Section3 />
+      <Section1 ready={!showSplash} />
+      <Section2 ready={!showSplash} />
+      <Section3 ready={!showSplash} />
     </div>
   );
 }
