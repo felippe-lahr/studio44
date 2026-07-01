@@ -405,12 +405,12 @@ function Navbar() {
  * agora contínua e animada em sincronia.
  * ------------------------------------------------------------------ */
 
-/* tokens de "sintaxe" em tons de cinza (mantém a paleta monocromática) */
-const kw = 'text-zinc-800 font-semibold'; // keyword
-const fn = 'text-zinc-600'; // função / identificador
-const st = 'text-stone-500'; // string
-const cm = 'text-stone-400'; // comentário
-const pl = 'text-stone-600'; // texto padrão
+/* tokens de "sintaxe" para tema escuro (paleta monocromática) */
+const kw = 'text-zinc-100 font-semibold'; // keyword
+const fn = 'text-zinc-300'; // função / identificador
+const st = 'text-zinc-400'; // string
+const cm = 'text-zinc-600'; // comentário
+const pl = 'text-zinc-300'; // texto padrão
 
 const heroCode: ReactNode[] = [
   <span className={cm}>{'// studio44 — consultoria digital'}</span>,
@@ -480,7 +480,7 @@ const heroCode: ReactNode[] = [
     <span className={fn}>voce</span>
     <span className={pl}>);</span>
     <span
-      className="inline-block w-[7px] h-[1.05em] ml-1 -mb-[0.15em] bg-zinc-700 align-middle"
+      className="inline-block w-[7px] h-[1.05em] ml-1 -mb-[0.15em] bg-zinc-200 align-middle"
       data-s44-caret
       style={{ animation: 's44-caret 1.1s step-end infinite' }}
     />
@@ -490,7 +490,7 @@ const heroCode: ReactNode[] = [
 function HeroCodeBackdrop() {
   return (
     <div
-      className="w-full h-full bg-stone-100 overflow-hidden relative select-none"
+      className="w-full h-full bg-[#0b0e14] overflow-hidden relative select-none"
       aria-hidden="true"
     >
       <div
@@ -510,7 +510,7 @@ function HeroCodeBackdrop() {
       </div>
       <div
         data-s44-scan
-        className="absolute left-0 right-0 top-0 h-32 bg-gradient-to-b from-transparent via-white/40 to-transparent pointer-events-none"
+        className="absolute left-0 right-0 top-0 h-32 bg-gradient-to-b from-transparent via-white/[0.06] to-transparent pointer-events-none"
         style={{ animation: 's44-code-scan 9s ease-in-out infinite' }}
       />
     </div>
@@ -550,9 +550,9 @@ function Section1({ ready }: { ready: boolean }) {
   return (
     <section
       ref={mergeRefs<HTMLElement>(section1Ref, s1Reveal.containerRef)}
-      className="h-screen w-full overflow-hidden flex flex-col pt-24 md:pt-24 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
+      className="h-screen w-full overflow-hidden flex flex-col pt-24 md:pt-24 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2 bg-[#0b0e14]"
     >
-      {/* Feature bars */}
+      {/* Feature bars — texto à esquerda, com vidro fosco atrás */}
       {featureBars.map((bar, i) => (
         <CodeMaskCard
           key={bar}
@@ -561,9 +561,11 @@ function Section1({ ready }: { ready: boolean }) {
           cardRef={(el) => (cardRefs.current[i] = el)}
           className="relative w-full h-14 md:h-20 shrink-0 rounded-xl md:rounded-2xl overflow-hidden"
         >
-          <span className="flex items-center justify-center h-full text-black text-lg md:text-3xl font-bold text-center relative z-10">
-            {bar}
-          </span>
+          <div className="relative z-10 flex items-center h-full pl-3 md:pl-6">
+            <span className="backdrop-blur-md bg-black/30 rounded-lg md:rounded-xl px-3 py-1 md:px-5 md:py-2 text-white text-lg md:text-3xl font-bold">
+              {bar}
+            </span>
+          </div>
         </CodeMaskCard>
       ))}
 
@@ -574,17 +576,17 @@ function Section1({ ready }: { ready: boolean }) {
         cardRef={(el) => (cardRefs.current[3] = el)}
         className="relative w-full flex-1 min-h-0 rounded-xl md:rounded-2xl overflow-hidden"
       >
-        <p className="absolute top-4 left-4 md:top-7 md:left-7 text-black text-xs md:text-sm font-semibold leading-4 md:leading-5 max-w-[200px] md:max-w-[300px] z-10">
+        <p className="absolute top-4 left-4 md:top-7 md:left-7 max-w-[220px] md:max-w-[320px] z-10 text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 backdrop-blur-md bg-black/30 rounded-lg px-3 py-2">
           Transformamos pequenas e médias empresas
           <br />
           em referências digitais.
         </p>
 
-        <div className="absolute bottom-5 left-3 md:bottom-8 md:left-4 z-10">
-          <span className="block text-black text-xs md:text-sm font-semibold mb-1 md:mb-2">
+        <div className="absolute bottom-5 left-3 md:bottom-8 md:left-4 z-10 backdrop-blur-md bg-black/30 rounded-xl md:rounded-2xl px-3 py-2 md:px-5 md:py-3">
+          <span className="block text-white text-xs md:text-sm font-semibold mb-1 md:mb-2">
             Consultoria Digital desde 2014
           </span>
-          <h1 className="text-black text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.79] tracking-tight">
+          <h1 className="text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.79] tracking-tight">
             Cresça
             <br />
             no Digital
@@ -593,7 +595,7 @@ function Section1({ ready }: { ready: boolean }) {
 
         <a
           href={CONTACT_HREF}
-          className="absolute bottom-6 right-4 md:bottom-10 md:right-8 text-zinc-700 text-xs md:text-sm font-semibold z-10"
+          className="absolute bottom-6 right-4 md:bottom-10 md:right-8 z-10 text-white text-xs md:text-sm font-semibold backdrop-blur-md bg-black/30 rounded-lg px-3 py-1.5"
         >
           Orçamento Grátis
         </a>
