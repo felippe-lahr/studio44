@@ -14,8 +14,7 @@ import {
  * melhor com a técnica de "masked cards" (Seções 1 e 2). Substitua
  * pelos seus próprios assets quando quiser.
  * ------------------------------------------------------------------ */
-const SECTION2_IMAGE =
-  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2400&auto=format&fit=crop';
+const SECTION2_IMAGE = '/section2.jpg';
 const SECTION3_IMG1 =
   'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1000&auto=format&fit=crop';
 const SECTION3_IMG2 =
