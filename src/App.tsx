@@ -17,8 +17,7 @@ import {
 const SECTION2_IMAGE = '/image-studio44-railway.jpg';
 const SECTION3_IMG1 =
   'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1000&auto=format&fit=crop';
-const SECTION3_IMG2 =
-  'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop';
+const SECTION3_IMG2 = '/uprocrm-card.jpg';
 const SECTION3_BG =
   'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1200&auto=format&fit=crop';
 
