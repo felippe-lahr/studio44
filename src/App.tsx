@@ -14,7 +14,7 @@ import {
  * melhor com a técnica de "masked cards" (Seções 1 e 2). Substitua
  * pelos seus próprios assets quando quiser.
  * ------------------------------------------------------------------ */
-const SECTION2_IMAGE = '/logo-studio-44-2026-2.png';
+const SECTION2_IMAGE = '/image-studio44-railway.jpg';
 const SECTION3_IMG1 =
   'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1000&auto=format&fit=crop';
 const SECTION3_IMG2 =
@@ -561,7 +561,7 @@ function Section1({ ready }: { ready: boolean }) {
   return (
     <section
       ref={s1Reveal.containerRef}
-      className="relative h-screen w-full overflow-hidden bg-[#0b0e14]"
+      className="relative h-[100svh] w-full overflow-hidden bg-[#0b0e14]"
     >
       {/* Fundo abstrato de código (full-bleed) */}
       <div className="absolute inset-0 z-0">
