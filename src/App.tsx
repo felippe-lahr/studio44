@@ -29,8 +29,6 @@ const CONTACT_HREF = 'https://wa.me/5599999999999';
 /* ------------------------------------------------------------------ *
  * DATA CONSTANTS
  * ------------------------------------------------------------------ */
-const featureBars = ['12 Anos de Experiência', 'Tecnologia com IA', 'Foco em Resultados'];
-
 type Service = { name: string; num: string | null; active: boolean };
 
 const services: Service[] = [
@@ -293,36 +291,43 @@ function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-6 py-2 md:py-3 bg-white/80 backdrop-blur-md">
-        {/* Logo */}
-        <a href="#" aria-label="Studio44 — Consultoria Digital" className="flex items-center">
+      <nav className="fixed top-0 left-0 right-0 z-50 grid grid-cols-3 items-center px-4 md:px-6 py-2 bg-white/80 backdrop-blur-md">
+        {/* Esquerda */}
+        <div className="flex justify-start">
+          <span className="hidden md:block text-sm font-semibold text-black">Resposta em 24h</span>
+        </div>
+
+        {/* Logo centralizado */}
+        <a
+          href="#"
+          aria-label="Studio44 — Consultoria Digital"
+          className="flex justify-center items-center"
+        >
           <img
             src="/logo.svg"
             alt="Studio44 — Consultoria Digital"
-            className="h-9 md:h-11 w-auto"
+            className="h-12 md:h-16 w-auto"
           />
         </a>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
+        {/* Direita: Menu (desktop) + hambúrguer (mobile) */}
+        <div className="flex justify-end items-center gap-6">
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="px-6 py-3 bg-white rounded-full border border-black text-sm font-semibold hover:bg-black hover:text-white transition-colors duration-200"
+            className="hidden md:block px-6 py-3 bg-white rounded-full border border-black text-sm font-semibold hover:bg-black hover:text-white transition-colors duration-200"
           >
             Menu
           </button>
-          <span className="text-sm font-semibold text-black">Resposta em 24h</span>
-        </div>
 
-        {/* Mobile hamburger */}
-        <button
-          type="button"
-          aria-label="Abrir menu"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="md:hidden w-10 h-10 flex items-center justify-center relative"
-        >
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            aria-label="Abrir menu"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="md:hidden w-10 h-10 flex items-center justify-center relative"
+          >
           <span
             className={`absolute h-0.5 w-6 bg-black rounded-full transition-all duration-300 ease-[cubic-bezier(0.76,0,0.24,1)] ${
               open ? 'rotate-45 translate-y-0' : '-translate-y-2'
@@ -338,7 +343,8 @@ function Navbar() {
               open ? '-rotate-45 translate-y-0' : 'translate-y-2'
             }`}
           />
-        </button>
+          </button>
+        </div>
       </nav>
 
       {/* Mobile menu overlay */}
@@ -496,13 +502,13 @@ const CODE_POOL: string[] = [
 ];
 
 /** Colunas de código pré-tokenizadas, com velocidade/direção/opacidade próprias. */
-const HERO_COLUMNS = Array.from({ length: 6 }, (_, c) => ({
+const HERO_COLUMNS = Array.from({ length: 4 }, (_, c) => ({
   lines: Array.from({ length: 26 }, (_, i) =>
     tokenizeLine(CODE_POOL[(i * 5 + c * 11 + (i % 3)) % CODE_POOL.length], `c${c}-l${i}`),
   ),
-  dur: [26, 34, 22, 30, 24, 38][c],
+  dur: [26, 34, 22, 30][c],
   reverse: c % 2 === 1,
-  opacity: [0.75, 0.5, 0.85, 0.55, 0.7, 0.5][c],
+  opacity: [0.8, 0.55, 0.85, 0.6][c],
 }));
 
 /** Fundo abstrato: várias colunas de código rolando em velocidades diferentes. */
@@ -569,46 +575,24 @@ function Section1({ ready }: { ready: boolean }) {
       </div>
 
       {/* Conteúdo por cima, com vidro fosco atrás de cada texto */}
-      <div className="relative z-10 h-full flex flex-col pt-24 md:pt-24 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2">
-        {/* 3 fileiras — texto à esquerda */}
-        {featureBars.map((bar, i) => (
-          <div
-            key={bar}
-            style={s1Reveal.getAnimStyle(i)}
-            className="h-14 md:h-20 shrink-0 flex items-center"
-          >
-            <span className="backdrop-blur-md bg-black/35 rounded-xl md:rounded-2xl px-4 py-1.5 md:px-6 md:py-2.5 text-white text-lg md:text-3xl font-bold">
-              {bar}
-            </span>
-          </div>
-        ))}
+      <div className="relative z-10 h-full flex flex-col justify-between pt-24 md:pt-28 px-4 md:px-8 pb-6 md:pb-10">
+        <p
+          style={s1Reveal.getAnimStyle(0)}
+          className="self-start max-w-[240px] md:max-w-[360px] text-white text-sm md:text-base font-semibold leading-5 md:leading-6 backdrop-blur-md bg-black/35 rounded-lg px-4 py-3"
+        >
+          Transformamos pequenas e médias empresas
+          <br />
+          em referências digitais.
+        </p>
 
-        {/* Área principal */}
-        <div style={s1Reveal.getAnimStyle(3)} className="relative flex-1 min-h-0">
-          <p className="absolute top-2 left-1 md:top-4 md:left-2 max-w-[220px] md:max-w-[320px] text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 backdrop-blur-md bg-black/35 rounded-lg px-3 py-2">
-            Transformamos pequenas e médias empresas
-            <br />
-            em referências digitais.
-          </p>
-
-          <div className="absolute bottom-2 left-1 md:bottom-4 md:left-2 backdrop-blur-md bg-black/35 rounded-xl md:rounded-2xl px-3 py-2 md:px-5 md:py-3">
-            <span className="block text-white text-xs md:text-sm font-semibold mb-1 md:mb-2">
-              Consultoria Digital desde 2014
-            </span>
-            <h1 className="text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.79] tracking-tight">
-              Cresça
-              <br />
-              no Digital
-            </h1>
-          </div>
-
-          <a
-            href={CONTACT_HREF}
-            className="absolute bottom-3 right-2 md:bottom-6 md:right-4 text-white text-xs md:text-sm font-semibold backdrop-blur-md bg-black/35 rounded-lg px-3 py-1.5"
-          >
-            Orçamento Grátis
-          </a>
-        </div>
+        <h1
+          style={s1Reveal.getAnimStyle(1)}
+          className="self-start text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.82] tracking-tight backdrop-blur-md bg-black/35 rounded-2xl px-4 py-3 md:px-6 md:py-4"
+        >
+          Cresça
+          <br />
+          no Digital
+        </h1>
       </div>
     </section>
   );
