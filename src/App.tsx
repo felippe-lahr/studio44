@@ -28,7 +28,6 @@ const CONTACT_HREF = 'https://wa.me/5599999999999';
 /* ------------------------------------------------------------------ *
  * DATA CONSTANTS
  * ------------------------------------------------------------------ */
-const featureBars = ['12 Anos de Experiência', 'Tecnologia com IA', 'Foco em Resultados'];
 
 type Service = { name: string; num: string | null; active: boolean };
 
@@ -298,7 +297,7 @@ function Navbar() {
           <img
             src="/logo.svg"
             alt="Studio44 — Consultoria Digital"
-            className="h-9 md:h-11 w-auto"
+            className="h-12 md:h-16 w-auto"
           />
         </a>
 
@@ -311,7 +310,6 @@ function Navbar() {
           >
             Menu
           </button>
-          <span className="text-sm font-semibold text-black">Resposta em 24h</span>
         </div>
 
         {/* Mobile hamburger */}
@@ -513,7 +511,10 @@ function HeroCodeField() {
     >
       <div className="absolute inset-0 flex justify-between gap-4 md:gap-8 px-3 md:px-8">
         {HERO_COLUMNS.map((col, c) => (
-          <div key={c} className="flex-1 min-w-0 overflow-hidden">
+          <div
+            key={c}
+            className={`flex-1 min-w-0 overflow-hidden ${c >= 2 ? 'hidden md:block' : ''}`}
+          >
             <div
               data-s44-code
               className="font-mono text-[10px] md:text-xs leading-5 md:leading-6 whitespace-pre"
@@ -568,46 +569,24 @@ function Section1({ ready }: { ready: boolean }) {
       </div>
 
       {/* Conteúdo por cima, com vidro fosco atrás de cada texto */}
-      <div className="relative z-10 h-full flex flex-col pt-24 md:pt-24 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2">
-        {/* 3 fileiras — texto à esquerda */}
-        {featureBars.map((bar, i) => (
-          <div
-            key={bar}
-            style={s1Reveal.getAnimStyle(i)}
-            className="h-14 md:h-20 shrink-0 flex items-center"
-          >
-            <span className="backdrop-blur-md bg-black/35 rounded-xl md:rounded-2xl px-4 py-1.5 md:px-6 md:py-2.5 text-white text-lg md:text-3xl font-bold">
-              {bar}
-            </span>
-          </div>
-        ))}
+      <div className="relative z-10 h-full flex flex-col justify-between pt-24 md:pt-28 px-4 md:px-8 pb-6 md:pb-10">
+        <p
+          style={s1Reveal.getAnimStyle(0)}
+          className="self-start max-w-[240px] md:max-w-[360px] text-white text-sm md:text-base font-semibold leading-5 md:leading-6 backdrop-blur-md bg-black/35 rounded-lg px-4 py-3"
+        >
+          Transformamos pequenas e médias empresas
+          <br />
+          em referências digitais.
+        </p>
 
-        {/* Área principal */}
-        <div style={s1Reveal.getAnimStyle(3)} className="relative flex-1 min-h-0">
-          <p className="absolute top-2 left-1 md:top-4 md:left-2 max-w-[220px] md:max-w-[320px] text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 backdrop-blur-md bg-black/35 rounded-lg px-3 py-2">
-            Transformamos pequenas e médias empresas
-            <br />
-            em referências digitais.
-          </p>
-
-          <div className="absolute bottom-2 left-1 md:bottom-4 md:left-2 backdrop-blur-md bg-black/35 rounded-xl md:rounded-2xl px-3 py-2 md:px-5 md:py-3">
-            <span className="block text-white text-xs md:text-sm font-semibold mb-1 md:mb-2">
-              Consultoria Digital desde 2014
-            </span>
-            <h1 className="text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.79] tracking-tight">
-              Cresça
-              <br />
-              no Digital
-            </h1>
-          </div>
-
-          <a
-            href={CONTACT_HREF}
-            className="absolute bottom-3 right-2 md:bottom-6 md:right-4 text-white text-xs md:text-sm font-semibold backdrop-blur-md bg-black/35 rounded-lg px-3 py-1.5"
-          >
-            Orçamento Grátis
-          </a>
-        </div>
+        <h1
+          style={s1Reveal.getAnimStyle(1)}
+          className="self-start text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.82] tracking-tight backdrop-blur-md bg-black/35 rounded-2xl px-4 py-3 md:px-6 md:py-4"
+        >
+          Cresça
+          <br />
+          no Digital
+        </h1>
       </div>
     </section>
   );
