@@ -399,207 +399,217 @@ function Navbar() {
 /* ------------------------------------------------------------------ *
  * SECTION 1 — HERO
  *
- * O fundo do Hero é uma "tela de programação" animada em fundo claro
- * (CSS puro), para o texto escuro ficar em evidência. Cada card mostra
- * uma janela da MESMA tela (mesmo conceito de mosaico dos masked cards),
- * agora contínua e animada em sincronia.
+ * Fundo escuro estilo "technology background": várias colunas de código
+ * colorido rolando em velocidades/direções diferentes (CSS puro), com
+ * vinheta de profundidade. O texto fica por cima, e atrás de cada bloco
+ * de texto há um vidro fosco (backdrop-blur) para garantir a legibilidade.
  * ------------------------------------------------------------------ */
 
-/* tokens de "sintaxe" para tema escuro (paleta monocromática) */
-const kw = 'text-zinc-100 font-semibold'; // keyword
-const fn = 'text-zinc-300'; // função / identificador
-const st = 'text-zinc-400'; // string
-const cm = 'text-zinc-600'; // comentário
-const pl = 'text-zinc-300'; // texto padrão
+/* Colore uma linha de código em tons tipo IDE (fundo abstrato). */
+const codeRegex =
+  /(\/\/[^\n]*)|('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`)|\b(const|let|var|function|return|if|else|for|while|import|export|from|async|await|class|new|this|true|false|null|type|interface|extends)\b|\b(\d+(?:\.\d+)?)\b|([{}()[\];:,.=+\-*\/<>|&!?])/g;
 
-const heroCode: ReactNode[] = [
-  <span className={cm}>{'// studio44 — consultoria digital'}</span>,
-  <>
-    <span className={kw}>export</span> <span className={kw}>const</span>{' '}
-    <span className={fn}>studio44</span> <span className={pl}>=</span> <span className={pl}>{'{'}</span>
-  </>,
-  <>
-    {'  '}
-    <span className={fn}>desde</span>
-    <span className={pl}>:</span> <span className={st}>2014</span>
-    <span className={pl}>,</span>
-  </>,
-  <>
-    {'  '}
-    <span className={fn}>servicos</span>
-    <span className={pl}>:</span> <span className={pl}>[</span>
-    <span className={st}>'wordpress'</span>
-    <span className={pl}>,</span> <span className={st}>'e-commerce'</span>
-    <span className={pl}>,</span>
-  </>,
-  <>
-    {'    '}
-    <span className={st}>'marketing'</span>
-    <span className={pl}>,</span> <span className={st}>'apps'</span>
-    <span className={pl}>,</span> <span className={st}>'ia'</span>
-    <span className={pl}>],</span>
-  </>,
-  <span>{' '}</span>,
-  <>
-    <span className={kw}>async function</span> <span className={fn}>crescer</span>
-    <span className={pl}>(</span>
-    <span className={fn}>cliente</span>
-    <span className={pl}>)</span> <span className={pl}>{'{'}</span>
-  </>,
-  <>
-    {'  '}
-    <span className={kw}>const</span> <span className={fn}>plano</span> <span className={pl}>=</span>{' '}
-    <span className={kw}>await</span> <span className={fn}>estrategia</span>
-    <span className={pl}>(</span>
-    <span className={fn}>cliente</span>
-    <span className={pl}>);</span>
-  </>,
-  <>
-    {'  '}
-    <span className={fn}>deploy</span>
-    <span className={pl}>(</span>
-    <span className={fn}>plano</span>
-    <span className={pl}>,</span> <span className={pl}>{'{'}</span> <span className={fn}>ia</span>
-    <span className={pl}>:</span> <span className={kw}>true</span> <span className={pl}>{'}'});</span>
-  </>,
-  <>
-    {'  '}
-    <span className={kw}>return</span> <span className={st}>'referência digital'</span>
-    <span className={pl}>;</span>
-  </>,
-  <span className={pl}>{'}'}</span>,
-  <span>{' '}</span>,
-  <>
-    <span className={cm}>{'// resultados que escalam'}</span>
-  </>,
-  <>
-    <span className={fn}>studio44</span>
-    <span className={pl}>.</span>
-    <span className={fn}>crescer</span>
-    <span className={pl}>(</span>
-    <span className={fn}>voce</span>
-    <span className={pl}>);</span>
-    <span
-      className="inline-block w-[7px] h-[1.05em] ml-1 -mb-[0.15em] bg-zinc-200 align-middle"
-      data-s44-caret
-      style={{ animation: 's44-caret 1.1s step-end infinite' }}
-    />
-  </>,
+const TOKEN = {
+  plain: '#9aa2ad',
+  comment: '#586074',
+  string: '#c98a63',
+  keyword: '#5b93c9',
+  number: '#8bbf6a',
+  punct: '#6b7280',
+};
+
+function tokenizeLine(line: string, keyBase: string): ReactNode[] {
+  const out: ReactNode[] = [];
+  let last = 0;
+  let idx = 0;
+  let m: RegExpExecArray | null;
+  codeRegex.lastIndex = 0;
+  while ((m = codeRegex.exec(line)) !== null) {
+    if (m.index > last) {
+      out.push(
+        <span key={`${keyBase}-${idx++}`} style={{ color: TOKEN.plain }}>
+          {line.slice(last, m.index)}
+        </span>,
+      );
+    }
+    let color = TOKEN.plain;
+    if (m[1]) color = TOKEN.comment;
+    else if (m[2]) color = TOKEN.string;
+    else if (m[3]) color = TOKEN.keyword;
+    else if (m[4]) color = TOKEN.number;
+    else if (m[5]) color = TOKEN.punct;
+    out.push(
+      <span key={`${keyBase}-${idx++}`} style={{ color }}>
+        {m[0]}
+      </span>,
+    );
+    last = codeRegex.lastIndex;
+  }
+  if (last < line.length) {
+    out.push(
+      <span key={`${keyBase}-${idx++}`} style={{ color: TOKEN.plain }}>
+        {line.slice(last)}
+      </span>,
+    );
+  }
+  return out;
+}
+
+const CODE_POOL: string[] = [
+  "import { render } from 'core';",
+  'const app = createApp(config);',
+  'export async function boot() {',
+  '  await db.connect(env.DB_URL);',
+  '  return app.listen(3000);',
+  '}',
+  'function compile(src) {',
+  '  const ast = parse(src);',
+  '  return generate(ast, opts);',
+  '}',
+  "const routes = ['/', '/api', '/ia'];",
+  'let cache = new Map();',
+  'for (let i = 0; i < n; i++) {',
+  '  queue.push(tasks[i]);',
+  '}',
+  'if (user.auth && token.valid) {',
+  '  grant(user, scope);',
+  '}',
+  'class Pipeline extends Stream {',
+  '  transform(c) { return map(c); }',
+  '}',
+  "const model = await ai.load('studio44');",
+  'const score = model.predict(input);',
+  '// deploy to production',
+  'await ci.run({ build: true, test: true });',
+  "export const version = '4.4.0';",
+  'const hash = sha256(payload);',
+  "socket.on('data', (d) => emit(d));",
+  'try { commit(tx); } catch (e) { rollback(); }',
+  'const pixels = buffer.slice(0, 1024);',
+  'render(app, root);',
+  'const theme = { dark: true, accent: 44 };',
+  'while (running) tick(delta);',
+  'const res = await fetch(api + id);',
+  'type Cliente = { nome: string; ativo: boolean };',
+  'matrix.forEach((row) => row.map(cell));',
+  "logger.info('studio44 ready');",
 ];
 
-function HeroCodeBackdrop() {
+/** Colunas de código pré-tokenizadas, com velocidade/direção/opacidade próprias. */
+const HERO_COLUMNS = Array.from({ length: 6 }, (_, c) => ({
+  lines: Array.from({ length: 26 }, (_, i) =>
+    tokenizeLine(CODE_POOL[(i * 5 + c * 11 + (i % 3)) % CODE_POOL.length], `c${c}-l${i}`),
+  ),
+  dur: [26, 34, 22, 30, 24, 38][c],
+  reverse: c % 2 === 1,
+  opacity: [0.75, 0.5, 0.85, 0.55, 0.7, 0.5][c],
+}));
+
+/** Fundo abstrato: várias colunas de código rolando em velocidades diferentes. */
+function HeroCodeField() {
   return (
     <div
       className="w-full h-full bg-[#0b0e14] overflow-hidden relative select-none"
       aria-hidden="true"
     >
-      <div
-        data-s44-code
-        className="absolute left-0 right-0 top-0 px-5 md:px-8 pt-6 font-mono text-[11px] md:text-[13px] leading-6 md:leading-7"
-        style={{ animation: 's44-code-scroll 55s linear infinite' }}
-      >
-        {[0, 1].map((rep) => (
-          <div key={rep}>
-            {heroCode.map((line, i) => (
-              <div key={i} className="whitespace-pre">
-                {line}
-              </div>
-            ))}
+      <div className="absolute inset-0 flex justify-between gap-4 md:gap-8 px-3 md:px-8">
+        {HERO_COLUMNS.map((col, c) => (
+          <div key={c} className="flex-1 min-w-0 overflow-hidden">
+            <div
+              data-s44-code
+              className="font-mono text-[10px] md:text-xs leading-5 md:leading-6 whitespace-pre"
+              style={{
+                opacity: col.opacity,
+                animation: `s44-code-scroll ${col.dur}s linear infinite`,
+                animationDirection: col.reverse ? 'reverse' : 'normal',
+              }}
+            >
+              {[0, 1].map((rep) => (
+                <div key={rep}>
+                  {col.lines.map((line, i) => (
+                    <div key={i}>{line}</div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
+
+      {/* profundidade / vinheta */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(120% 90% at 50% 45%, rgba(11,14,20,0) 42%, rgba(11,14,20,0.92) 100%)',
+        }}
+      />
+
+      {/* faixa de luz varrendo */}
       <div
         data-s44-scan
-        className="absolute left-0 right-0 top-0 h-32 bg-gradient-to-b from-transparent via-white/[0.06] to-transparent pointer-events-none"
+        className="absolute left-0 right-0 top-0 h-40 bg-gradient-to-b from-transparent via-white/[0.05] to-transparent pointer-events-none"
         style={{ animation: 's44-code-scan 9s ease-in-out infinite' }}
       />
     </div>
   );
 }
 
-type CodeMaskCardProps = {
-  position?: MaskPosition;
-  reveal: CSSProperties;
-  cardRef: Ref<HTMLDivElement>;
-  className: string;
-  children?: ReactNode;
-};
-
-/** Card que mostra uma janela da tela de código contínua (efeito mosaico). */
-function CodeMaskCard({ position, reveal, cardRef, className, children }: CodeMaskCardProps) {
-  const pos = position ?? { x: 0, y: 0, sw: 0, sh: 0 };
-  return (
-    <div ref={cardRef} className={className} style={reveal}>
-      <div
-        className="absolute"
-        style={{ width: pos.sw, height: pos.sh, left: -pos.x, top: -pos.y }}
-      >
-        <HeroCodeBackdrop />
-      </div>
-      {children}
-    </div>
-  );
-}
-
 function Section1({ ready }: { ready: boolean }) {
-  const section1Ref = useRef<HTMLElement>(null);
-  const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const s1Reveal = useStaggeredReveal(4, ready);
-  const positions = useMaskPositions(section1Ref, cardRefs);
 
   return (
     <section
-      ref={mergeRefs<HTMLElement>(section1Ref, s1Reveal.containerRef)}
-      className="h-screen w-full overflow-hidden flex flex-col pt-24 md:pt-24 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2 bg-[#0b0e14]"
+      ref={s1Reveal.containerRef}
+      className="relative h-screen w-full overflow-hidden bg-[#0b0e14]"
     >
-      {/* Feature bars — texto à esquerda, com vidro fosco atrás */}
-      {featureBars.map((bar, i) => (
-        <CodeMaskCard
-          key={bar}
-          position={positions[i]}
-          reveal={s1Reveal.getAnimStyle(i)}
-          cardRef={(el) => (cardRefs.current[i] = el)}
-          className="relative w-full h-14 md:h-20 shrink-0 rounded-xl md:rounded-2xl overflow-hidden"
-        >
-          <div className="relative z-10 flex items-center h-full pl-3 md:pl-6">
-            <span className="backdrop-blur-md bg-black/30 rounded-lg md:rounded-xl px-3 py-1 md:px-5 md:py-2 text-white text-lg md:text-3xl font-bold">
+      {/* Fundo abstrato de código (full-bleed) */}
+      <div className="absolute inset-0 z-0">
+        <HeroCodeField />
+      </div>
+
+      {/* Conteúdo por cima, com vidro fosco atrás de cada texto */}
+      <div className="relative z-10 h-full flex flex-col pt-24 md:pt-24 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2">
+        {/* 3 fileiras — texto à esquerda */}
+        {featureBars.map((bar, i) => (
+          <div
+            key={bar}
+            style={s1Reveal.getAnimStyle(i)}
+            className="h-14 md:h-20 shrink-0 flex items-center"
+          >
+            <span className="backdrop-blur-md bg-black/35 rounded-xl md:rounded-2xl px-4 py-1.5 md:px-6 md:py-2.5 text-white text-lg md:text-3xl font-bold">
               {bar}
             </span>
           </div>
-        </CodeMaskCard>
-      ))}
+        ))}
 
-      {/* Main hero card */}
-      <CodeMaskCard
-        position={positions[3]}
-        reveal={s1Reveal.getAnimStyle(3)}
-        cardRef={(el) => (cardRefs.current[3] = el)}
-        className="relative w-full flex-1 min-h-0 rounded-xl md:rounded-2xl overflow-hidden"
-      >
-        <p className="absolute top-4 left-4 md:top-7 md:left-7 max-w-[220px] md:max-w-[320px] z-10 text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 backdrop-blur-md bg-black/30 rounded-lg px-3 py-2">
-          Transformamos pequenas e médias empresas
-          <br />
-          em referências digitais.
-        </p>
-
-        <div className="absolute bottom-5 left-3 md:bottom-8 md:left-4 z-10 backdrop-blur-md bg-black/30 rounded-xl md:rounded-2xl px-3 py-2 md:px-5 md:py-3">
-          <span className="block text-white text-xs md:text-sm font-semibold mb-1 md:mb-2">
-            Consultoria Digital desde 2014
-          </span>
-          <h1 className="text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.79] tracking-tight">
-            Cresça
+        {/* Área principal */}
+        <div style={s1Reveal.getAnimStyle(3)} className="relative flex-1 min-h-0">
+          <p className="absolute top-2 left-1 md:top-4 md:left-2 max-w-[220px] md:max-w-[320px] text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 backdrop-blur-md bg-black/35 rounded-lg px-3 py-2">
+            Transformamos pequenas e médias empresas
             <br />
-            no Digital
-          </h1>
-        </div>
+            em referências digitais.
+          </p>
 
-        <a
-          href={CONTACT_HREF}
-          className="absolute bottom-6 right-4 md:bottom-10 md:right-8 z-10 text-white text-xs md:text-sm font-semibold backdrop-blur-md bg-black/30 rounded-lg px-3 py-1.5"
-        >
-          Orçamento Grátis
-        </a>
-      </CodeMaskCard>
+          <div className="absolute bottom-2 left-1 md:bottom-4 md:left-2 backdrop-blur-md bg-black/35 rounded-xl md:rounded-2xl px-3 py-2 md:px-5 md:py-3">
+            <span className="block text-white text-xs md:text-sm font-semibold mb-1 md:mb-2">
+              Consultoria Digital desde 2014
+            </span>
+            <h1 className="text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.79] tracking-tight">
+              Cresça
+              <br />
+              no Digital
+            </h1>
+          </div>
+
+          <a
+            href={CONTACT_HREF}
+            className="absolute bottom-3 right-2 md:bottom-6 md:right-4 text-white text-xs md:text-sm font-semibold backdrop-blur-md bg-black/35 rounded-lg px-3 py-1.5"
+          >
+            Orçamento Grátis
+          </a>
+        </div>
+      </div>
     </section>
   );
 }
