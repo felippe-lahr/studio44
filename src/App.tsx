@@ -14,8 +14,6 @@ import {
  * melhor com a técnica de "masked cards" (Seções 1 e 2). Substitua
  * pelos seus próprios assets quando quiser.
  * ------------------------------------------------------------------ */
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2400&auto=format&fit=crop';
 const SECTION2_IMAGE =
   'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2400&auto=format&fit=crop';
 const SECTION3_IMG1 =
@@ -400,18 +398,154 @@ function Navbar() {
 
 /* ------------------------------------------------------------------ *
  * SECTION 1 — HERO
+ *
+ * O fundo do Hero é uma "tela de programação" animada em fundo claro
+ * (CSS puro), para o texto escuro ficar em evidência. Cada card mostra
+ * uma janela da MESMA tela (mesmo conceito de mosaico dos masked cards),
+ * agora contínua e animada em sincronia.
  * ------------------------------------------------------------------ */
+
+/* tokens de "sintaxe" em tons de cinza (mantém a paleta monocromática) */
+const kw = 'text-zinc-800 font-semibold'; // keyword
+const fn = 'text-zinc-600'; // função / identificador
+const st = 'text-stone-500'; // string
+const cm = 'text-stone-400'; // comentário
+const pl = 'text-stone-600'; // texto padrão
+
+const heroCode: ReactNode[] = [
+  <span className={cm}>{'// studio44 — consultoria digital'}</span>,
+  <>
+    <span className={kw}>export</span> <span className={kw}>const</span>{' '}
+    <span className={fn}>studio44</span> <span className={pl}>=</span> <span className={pl}>{'{'}</span>
+  </>,
+  <>
+    {'  '}
+    <span className={fn}>desde</span>
+    <span className={pl}>:</span> <span className={st}>2014</span>
+    <span className={pl}>,</span>
+  </>,
+  <>
+    {'  '}
+    <span className={fn}>servicos</span>
+    <span className={pl}>:</span> <span className={pl}>[</span>
+    <span className={st}>'wordpress'</span>
+    <span className={pl}>,</span> <span className={st}>'e-commerce'</span>
+    <span className={pl}>,</span>
+  </>,
+  <>
+    {'    '}
+    <span className={st}>'marketing'</span>
+    <span className={pl}>,</span> <span className={st}>'apps'</span>
+    <span className={pl}>,</span> <span className={st}>'ia'</span>
+    <span className={pl}>],</span>
+  </>,
+  <span>{' '}</span>,
+  <>
+    <span className={kw}>async function</span> <span className={fn}>crescer</span>
+    <span className={pl}>(</span>
+    <span className={fn}>cliente</span>
+    <span className={pl}>)</span> <span className={pl}>{'{'}</span>
+  </>,
+  <>
+    {'  '}
+    <span className={kw}>const</span> <span className={fn}>plano</span> <span className={pl}>=</span>{' '}
+    <span className={kw}>await</span> <span className={fn}>estrategia</span>
+    <span className={pl}>(</span>
+    <span className={fn}>cliente</span>
+    <span className={pl}>);</span>
+  </>,
+  <>
+    {'  '}
+    <span className={fn}>deploy</span>
+    <span className={pl}>(</span>
+    <span className={fn}>plano</span>
+    <span className={pl}>,</span> <span className={pl}>{'{'}</span> <span className={fn}>ia</span>
+    <span className={pl}>:</span> <span className={kw}>true</span> <span className={pl}>{'}'});</span>
+  </>,
+  <>
+    {'  '}
+    <span className={kw}>return</span> <span className={st}>'referência digital'</span>
+    <span className={pl}>;</span>
+  </>,
+  <span className={pl}>{'}'}</span>,
+  <span>{' '}</span>,
+  <>
+    <span className={cm}>{'// resultados que escalam'}</span>
+  </>,
+  <>
+    <span className={fn}>studio44</span>
+    <span className={pl}>.</span>
+    <span className={fn}>crescer</span>
+    <span className={pl}>(</span>
+    <span className={fn}>voce</span>
+    <span className={pl}>);</span>
+    <span
+      className="inline-block w-[7px] h-[1.05em] ml-1 -mb-[0.15em] bg-zinc-700 align-middle"
+      data-s44-caret
+      style={{ animation: 's44-caret 1.1s step-end infinite' }}
+    />
+  </>,
+];
+
+function HeroCodeBackdrop() {
+  return (
+    <div
+      className="w-full h-full bg-stone-100 overflow-hidden relative select-none"
+      aria-hidden="true"
+    >
+      <div
+        data-s44-code
+        className="absolute left-0 right-0 top-0 px-5 md:px-8 pt-6 font-mono text-[11px] md:text-[13px] leading-6 md:leading-7"
+        style={{ animation: 's44-code-scroll 55s linear infinite' }}
+      >
+        {[0, 1].map((rep) => (
+          <div key={rep}>
+            {heroCode.map((line, i) => (
+              <div key={i} className="whitespace-pre">
+                {line}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div
+        data-s44-scan
+        className="absolute left-0 right-0 top-0 h-32 bg-gradient-to-b from-transparent via-white/40 to-transparent pointer-events-none"
+        style={{ animation: 's44-code-scan 9s ease-in-out infinite' }}
+      />
+    </div>
+  );
+}
+
+type CodeMaskCardProps = {
+  position?: MaskPosition;
+  reveal: CSSProperties;
+  cardRef: Ref<HTMLDivElement>;
+  className: string;
+  children?: ReactNode;
+};
+
+/** Card que mostra uma janela da tela de código contínua (efeito mosaico). */
+function CodeMaskCard({ position, reveal, cardRef, className, children }: CodeMaskCardProps) {
+  const pos = position ?? { x: 0, y: 0, sw: 0, sh: 0 };
+  return (
+    <div ref={cardRef} className={className} style={reveal}>
+      <div
+        className="absolute"
+        style={{ width: pos.sw, height: pos.sh, left: -pos.x, top: -pos.y }}
+      >
+        <HeroCodeBackdrop />
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function Section1({ ready }: { ready: boolean }) {
-  const isMobile = useIsMobile();
   const section1Ref = useRef<HTMLElement>(null);
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const s1Reveal = useStaggeredReveal(4, ready);
-
   const positions = useMaskPositions(section1Ref, cardRefs);
-  const sectionWidth = positions[0]?.sw ?? 0;
-  const sectionHeight = positions[0]?.sh ?? 0;
-  const { renderW, renderH } = useCoverImage(HERO_IMAGE, sectionWidth, sectionHeight);
-  const focalX = isMobile ? 0.7 : 0.8;
 
   return (
     <section
@@ -420,33 +554,25 @@ function Section1({ ready }: { ready: boolean }) {
     >
       {/* Feature bars */}
       {featureBars.map((bar, i) => (
-        <MaskedCard
+        <CodeMaskCard
           key={bar}
-          bgImage={HERO_IMAGE}
           position={positions[i]}
-          renderW={renderW}
-          renderH={renderH}
-          focalX={focalX}
+          reveal={s1Reveal.getAnimStyle(i)}
           cardRef={(el) => (cardRefs.current[i] = el)}
-          style={s1Reveal.getAnimStyle(i)}
-          className="w-full h-14 md:h-20 shrink-0 rounded-xl md:rounded-2xl overflow-hidden relative"
+          className="relative w-full h-14 md:h-20 shrink-0 rounded-xl md:rounded-2xl overflow-hidden"
         >
           <span className="flex items-center justify-center h-full text-black text-lg md:text-3xl font-bold text-center relative z-10">
             {bar}
           </span>
-        </MaskedCard>
+        </CodeMaskCard>
       ))}
 
       {/* Main hero card */}
-      <MaskedCard
-        bgImage={HERO_IMAGE}
+      <CodeMaskCard
         position={positions[3]}
-        renderW={renderW}
-        renderH={renderH}
-        focalX={focalX}
+        reveal={s1Reveal.getAnimStyle(3)}
         cardRef={(el) => (cardRefs.current[3] = el)}
-        style={s1Reveal.getAnimStyle(3)}
-        className="w-full flex-1 min-h-0 rounded-xl md:rounded-2xl overflow-hidden relative"
+        className="relative w-full flex-1 min-h-0 rounded-xl md:rounded-2xl overflow-hidden"
       >
         <p className="absolute top-4 left-4 md:top-7 md:left-7 text-black text-xs md:text-sm font-semibold leading-4 md:leading-5 max-w-[200px] md:max-w-[300px] z-10">
           Transformamos pequenas e médias empresas
@@ -467,11 +593,11 @@ function Section1({ ready }: { ready: boolean }) {
 
         <a
           href={CONTACT_HREF}
-          className="absolute bottom-6 right-4 md:bottom-10 md:right-8 text-white text-xs md:text-sm font-semibold z-10"
+          className="absolute bottom-6 right-4 md:bottom-10 md:right-8 text-zinc-700 text-xs md:text-sm font-semibold z-10"
         >
           Orçamento Grátis
         </a>
-      </MaskedCard>
+      </CodeMaskCard>
     </section>
   );
 }
