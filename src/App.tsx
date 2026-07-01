@@ -294,7 +294,7 @@ function Navbar() {
         {/* Logo */}
         <a href="#" aria-label="Studio44 — Consultoria Digital" className="flex items-center">
           <img
-            src="/logo.svg"
+            src="/logo-studio44-3.svg"
             alt="Studio44 — Consultoria Digital"
             className="h-12 md:h-16 w-auto"
           />
