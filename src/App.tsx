@@ -14,6 +14,8 @@ import {
  * melhor com a técnica de "masked cards" (Seções 1 e 2). Substitua
  * pelos seus próprios assets quando quiser.
  * ------------------------------------------------------------------ */
+const SECTION2_IMAGE =
+  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2400&auto=format&fit=crop';
 const SECTION3_IMG1 =
   'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1000&auto=format&fit=crop';
 const SECTION3_IMG2 =
@@ -98,6 +100,96 @@ function useMaskPositions(
   }, [sectionRef, cardRefs]);
 
   return positions;
+}
+
+type CoverSize = { renderW: number; renderH: number };
+
+/**
+ * Carrega a imagem e devolve as dimensões renderizadas usando lógica de
+ * "cover": escala pelo MAIOR dos dois fatores (largura/altura) para que a
+ * imagem cubra toda a seção, independente da proporção. Assim nenhuma
+ * imagem (mesmo quase quadrada) deixa faixas brancas em telas largas.
+ */
+function useCoverImage(src: string, sectionWidth: number, sectionHeight: number): CoverSize {
+  const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setNatural({ w: img.naturalWidth, h: img.naturalHeight });
+    img.src = src;
+  }, [src]);
+
+  if (!natural || sectionWidth === 0 || sectionHeight === 0) {
+    return { renderW: 0, renderH: 0 };
+  }
+  const scale = Math.max(sectionWidth / natural.w, sectionHeight / natural.h);
+  return { renderW: natural.w * scale, renderH: natural.h * scale };
+}
+
+type MaskedCardProps = {
+  bgImage: string;
+  position?: MaskPosition;
+  renderW: number;
+  renderH: number;
+  focalX: number;
+  focalY?: number;
+  className?: string;
+  children?: ReactNode;
+  cardRef?: Ref<HTMLDivElement>;
+  style?: CSSProperties;
+};
+
+function MaskedCard({
+  bgImage,
+  position,
+  renderW,
+  renderH,
+  focalX,
+  focalY = 0.5,
+  className = '',
+  children,
+  cardRef,
+  style,
+}: MaskedCardProps) {
+  const pos = position ?? { x: 0, y: 0, sw: 0, sh: 0 };
+  const overflowX = renderW > pos.sw ? renderW - pos.sw : 0;
+  const overflowY = renderH > pos.sh ? renderH - pos.sh : 0;
+  const focalOffsetX = overflowX * focalX;
+  const focalOffsetY = overflowY * focalY;
+
+  return (
+    <div
+      ref={cardRef}
+      className={className}
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: `${renderW}px ${renderH}px`,
+        backgroundPosition: `-${pos.x + focalOffsetX}px -${pos.y + focalOffsetY}px`,
+        backgroundRepeat: 'no-repeat',
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * OTHER HOOKS
+ * ------------------------------------------------------------------ */
+function useIsMobile(): boolean {
+  const [isMobile, setIsMobile] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  return isMobile;
 }
 
 function useStaggeredReveal(_count: number, active = true, threshold = 0.15) {
@@ -508,199 +600,18 @@ function Section1({ ready }: { ready: boolean }) {
 
 /* ------------------------------------------------------------------ *
  * SECTION 2 — SERVIÇOS / PORTFÓLIO
- *
- * Fundo (mosaico fatiado entre os cards): um MacBook Pro space gray
- * inclinado, com a tela rodando um mock do painel da Railway com um
- * deploy "building" animado, sobre um ambiente escuro desfocado.
  * ------------------------------------------------------------------ */
-const LOG_LINES = [
-  '=> [internal] load build context',
-  '=> [build 1/6] RUN npm ci',
-  '   added 214 packages in 6s',
-  '=> [build 2/6] RUN npm run build',
-  '   > tsc && vite build',
-  '   vite v5.4.21 building for production',
-  '   ✓ 31 modules transformed',
-  '   dist/index.html          0.93 kB',
-  '   dist/assets/index.css   20.78 kB',
-  '   dist/assets/index.js   160.38 kB',
-  '   ✓ built in 1.13s',
-  '=> exporting to image',
-  '=> => writing image sha256:9f2a1c…',
-  '=> pushing layers to registry',
-  'Starting Container',
-  '$ serve -s dist -l 8080',
-  'INFO  Accepting connections on :8080',
-];
-
-function logColor(line: string): string {
-  if (line.includes('✓')) return '#6ee7a8';
-  const t = line.trimStart();
-  if (t.startsWith('=>')) return '#93a4ff';
-  if (t.startsWith('INFO') || t.startsWith('$')) return '#c4b5fd';
-  return 'rgba(255,255,255,0.42)';
-}
-
-/** Mock do painel da Railway com deploy em curso (building) animado. */
-function RailwayPanel() {
-  return (
-    <div className="w-full h-full bg-[#0e0b16] flex flex-col text-[10px] leading-tight">
-      {/* header */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-white/10">
-        <span className="w-4 h-4 rounded bg-white/10 flex items-center justify-center text-white/70 text-[9px]">
-          ◈
-        </span>
-        <span className="text-white/90 font-semibold">studio44</span>
-        <div className="ml-auto flex items-center gap-3 text-white/30">
-          <span className="text-white/80">Deployments</span>
-          <span>Variables</span>
-          <span>Metrics</span>
-        </div>
-      </div>
-      {/* url */}
-      <div className="px-3 py-1.5 text-white/35 flex items-center gap-1.5 border-b border-white/5">
-        <span className="w-2.5 h-2.5 rounded-full border border-white/25" />
-        studio44-production.up.railway.app
-      </div>
-      {/* deploy cards */}
-      <div className="p-3 space-y-2">
-        <div className="rounded-md border border-emerald-400/25 bg-emerald-400/[0.06] px-2.5 py-2 flex items-center gap-2">
-          <span className="px-1.5 py-0.5 rounded bg-emerald-400/15 text-emerald-300 text-[8px] font-bold tracking-wide">
-            ACTIVE
-          </span>
-          <span className="text-white/55 truncate">Hero cleanup + centered larger logo</span>
-        </div>
-        <div className="rounded-md border border-indigo-400/40 bg-indigo-500/10 px-2.5 py-2">
-          <div className="flex items-center gap-2">
-            <span
-              data-s44-pulse
-              style={{ animation: 's44-pulse 1.4s ease-in-out infinite' }}
-              className="px-1.5 py-0.5 rounded bg-indigo-400/20 text-indigo-200 text-[8px] font-bold tracking-wide"
-            >
-              BUILDING
-            </span>
-            <span className="text-white/70 truncate">Railway MacBook deploy scene</span>
-            <span
-              data-s44-spin
-              style={{ animation: 's44-spin 0.9s linear infinite' }}
-              className="ml-auto w-3 h-3 rounded-full border-2 border-indigo-200/25 border-t-indigo-200"
-            />
-          </div>
-          <div className="mt-1.5 text-indigo-200/70">Deployment in progress: Building the image…</div>
-          <div className="mt-1.5 h-1 rounded-full bg-white/10 overflow-hidden relative">
-            <div
-              data-s44-progress
-              style={{ animation: 's44-indeterminate 1.6s ease-in-out infinite' }}
-              className="absolute inset-y-0 w-1/3 rounded-full bg-indigo-300/80"
-            />
-          </div>
-        </div>
-      </div>
-      {/* logs */}
-      <div className="mx-3 mb-3 flex-1 min-h-0 rounded-md bg-black/50 border border-white/5 overflow-hidden font-mono text-[9px] leading-4 px-2.5 py-1.5">
-        <div data-s44-logs style={{ animation: 's44-code-scroll 14s linear infinite' }}>
-          {[0, 1].map((rep) => (
-            <div key={rep}>
-              {LOG_LINES.map((ln, i) => (
-                <div key={i} className="whitespace-pre" style={{ color: logColor(ln) }}>
-                  {ln}
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** Cena: MacBook Pro space gray inclinado sobre ambiente escuro desfocado. */
-function RailwayMacScene() {
-  return (
-    <div
-      className="w-full h-full bg-[#0a0b0f] overflow-hidden relative select-none"
-      aria-hidden="true"
-    >
-      {/* ambiente desfocado */}
-      <div className="absolute -top-24 -left-16 w-96 h-96 rounded-full bg-indigo-600/25 blur-3xl" />
-      <div className="absolute -bottom-24 -right-16 w-[30rem] h-[30rem] rounded-full bg-fuchsia-600/15 blur-3xl" />
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-sky-500/10 blur-3xl" />
-
-      {/* MacBook */}
-      <div
-        className="absolute inset-0 flex items-center justify-center"
-        style={{ perspective: '2000px' }}
-      >
-        <div
-          className="relative"
-          style={{ transformStyle: 'preserve-3d', transform: 'rotateX(12deg) rotateY(-24deg)' }}
-        >
-          {/* lid / tela */}
-          <div
-            className="rounded-2xl bg-[#3a3d42] p-2 shadow-2xl ring-1 ring-black/40"
-            style={{ width: 660, transformOrigin: 'bottom center', transform: 'rotateX(-14deg)' }}
-          >
-            <div className="rounded-lg overflow-hidden bg-black" style={{ height: 400 }}>
-              <RailwayPanel />
-            </div>
-          </div>
-          {/* base / deck */}
-          <div
-            className="rounded-b-2xl bg-gradient-to-b from-[#34373c] to-[#232528] shadow-2xl"
-            style={{
-              width: 700,
-              height: 150,
-              marginLeft: -20,
-              transformOrigin: 'top center',
-              transform: 'rotateX(72deg)',
-            }}
-          >
-            <div className="mx-auto mt-5 w-44 h-16 rounded-md bg-white/[0.04] border border-white/10" />
-          </div>
-        </div>
-      </div>
-
-      {/* vinheta */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(120% 100% at 50% 45%, rgba(10,11,15,0) 40%, rgba(10,11,15,0.85) 100%)',
-        }}
-      />
-    </div>
-  );
-}
-
-type SceneMaskCardProps = {
-  position?: MaskPosition;
-  reveal: CSSProperties;
-  cardRef: Ref<HTMLDivElement>;
-  className: string;
-  children?: ReactNode;
-};
-
-/** Card que mostra uma janela da cena do MacBook (efeito mosaico). */
-function SceneMaskCard({ position, reveal, cardRef, className, children }: SceneMaskCardProps) {
-  const pos = position ?? { x: 0, y: 0, sw: 0, sh: 0 };
-  return (
-    <div ref={cardRef} className={className} style={reveal}>
-      <div
-        className="absolute"
-        style={{ width: pos.sw, height: pos.sh, left: -pos.x, top: -pos.y }}
-      >
-        <RailwayMacScene />
-      </div>
-      {children}
-    </div>
-  );
-}
-
 function Section2({ ready }: { ready: boolean }) {
+  const isMobile = useIsMobile();
   const section2Ref = useRef<HTMLElement>(null);
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const s2Reveal = useStaggeredReveal(4, ready);
+
   const positions = useMaskPositions(section2Ref, cardRefs);
+  const sectionWidth = positions[0]?.sw ?? 0;
+  const sectionHeight = positions[0]?.sh ?? 0;
+  const { renderW, renderH } = useCoverImage(SECTION2_IMAGE, sectionWidth, sectionHeight);
+  const focalX = isMobile ? 0.65 : 0.8;
 
   return (
     <section
@@ -709,28 +620,36 @@ function Section2({ ready }: { ready: boolean }) {
     >
       <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[auto_auto_auto_auto] md:grid-rows-[1fr_1fr_0.8fr] gap-1.5 md:gap-2">
         {/* Card 0 — Top Left */}
-        <SceneMaskCard
+        <MaskedCard
+          bgImage={SECTION2_IMAGE}
           position={positions[0]}
-          reveal={s2Reveal.getAnimStyle(0)}
+          renderW={renderW}
+          renderH={renderH}
+          focalX={focalX}
           cardRef={(el) => (cardRefs.current[0] = el)}
+          style={s2Reveal.getAnimStyle(0)}
           className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
         >
-          <h2 className="absolute top-4 left-5 md:top-6 md:left-7 text-white text-2xl md:text-3xl font-bold z-10 backdrop-blur-md bg-black/30 rounded-lg px-3 py-1.5">
+          <h2 className="absolute top-4 left-5 md:top-6 md:left-7 text-white md:text-black text-2xl md:text-3xl font-bold z-10">
             Nossos Serviços
           </h2>
-          <p className="absolute bottom-4 left-5 md:bottom-6 md:left-7 text-white text-xs md:text-sm font-semibold z-10 backdrop-blur-md bg-black/30 rounded-md px-2.5 py-1.5">
+          <p className="absolute bottom-4 left-5 md:bottom-6 md:left-7 text-white md:text-black text-xs md:text-sm font-semibold z-10">
             O que entregamos para o seu negócio
           </p>
-        </SceneMaskCard>
+        </MaskedCard>
 
         {/* Card 1 — Top Right (spans 2 rows on desktop) */}
-        <SceneMaskCard
+        <MaskedCard
+          bgImage={SECTION2_IMAGE}
           position={positions[1]}
-          reveal={s2Reveal.getAnimStyle(1)}
+          renderW={renderW}
+          renderH={renderH}
+          focalX={focalX}
           cardRef={(el) => (cardRefs.current[1] = el)}
+          style={s2Reveal.getAnimStyle(1)}
           className="md:row-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
         >
-          <p className="absolute bottom-16 left-5 md:bottom-20 md:left-7 text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 z-10 backdrop-blur-md bg-black/30 rounded-lg px-3 py-2">
+          <p className="absolute bottom-16 left-5 md:bottom-20 md:left-7 text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 z-10">
             Quer escalar o seu negócio no digital?
             <br />
             Vamos conversar sobre o seu projeto.
@@ -741,27 +660,35 @@ function Section2({ ready }: { ready: boolean }) {
           >
             Fale Conosco
           </a>
-        </SceneMaskCard>
+        </MaskedCard>
 
         {/* Card 2 — Bottom Left */}
-        <SceneMaskCard
+        <MaskedCard
+          bgImage={SECTION2_IMAGE}
           position={positions[2]}
-          reveal={s2Reveal.getAnimStyle(2)}
+          renderW={renderW}
+          renderH={renderH}
+          focalX={focalX}
           cardRef={(el) => (cardRefs.current[2] = el)}
+          style={s2Reveal.getAnimStyle(2)}
           className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
         >
-          <h2 className="absolute top-4 left-5 md:top-6 md:left-7 text-white text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.9] z-10 backdrop-blur-md bg-black/30 rounded-xl px-3 py-2">
+          <h2 className="absolute top-4 left-5 md:top-6 md:left-7 text-white md:text-black text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.9] z-10">
             Soluções
             <br />
             Sob Medida
           </h2>
-        </SceneMaskCard>
+        </MaskedCard>
 
         {/* Card 3 — Bottom Full Width (Services) */}
-        <SceneMaskCard
+        <MaskedCard
+          bgImage={SECTION2_IMAGE}
           position={positions[3]}
-          reveal={s2Reveal.getAnimStyle(3)}
+          renderW={renderW}
+          renderH={renderH}
+          focalX={focalX}
           cardRef={(el) => (cardRefs.current[3] = el)}
+          style={s2Reveal.getAnimStyle(3)}
           className="col-span-1 md:col-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
         >
           <div className="absolute inset-0 z-10 flex flex-wrap md:flex-nowrap gap-1.5 md:gap-2 p-2 md:p-3">
@@ -791,7 +718,7 @@ function Section2({ ready }: { ready: boolean }) {
               </div>
             ))}
           </div>
-        </SceneMaskCard>
+        </MaskedCard>
       </div>
     </section>
   );

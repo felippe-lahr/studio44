@@ -55,40 +55,10 @@
   }
 }
 
-/* Railway deploy mock (Seção 2) */
-@keyframes s44-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes s44-indeterminate {
-  0% {
-    transform: translateX(-120%);
-  }
-  100% {
-    transform: translateX(340%);
-  }
-}
-
-@keyframes s44-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.45;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   [data-s44-code],
   [data-s44-scan],
-  [data-s44-caret],
-  [data-s44-logs],
-  [data-s44-spin],
-  [data-s44-progress],
-  [data-s44-pulse] {
+  [data-s44-caret] {
     animation: none !important;
   }
 }
