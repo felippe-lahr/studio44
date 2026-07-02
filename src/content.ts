@@ -98,6 +98,8 @@ export type Content = {
     overlay1: TextField;
     overlay2: TextField;
   };
+  /** Barra fina no rodapé (endereço, CNPJ, etc.). Altura máx. 50px. */
+  footer: TextField;
 };
 
 export const DEFAULT_CONTENT: Content = {
@@ -150,6 +152,10 @@ export const DEFAULT_CONTENT: Content = {
     consultButton: 'Agende uma Conversa',
     overlay1: { text: 'Do Projeto\nà Entrega,\ncom Método' },
     overlay2: { text: 'Suporte\ne Evolução\nContínua' },
+  },
+  footer: {
+    text: 'Rua Exemplo, 123 — Cidade/UF  ·  CNPJ 00.000.000/0001-00',
+    pos: { h: 'center', v: 'center' },
   },
 };
 

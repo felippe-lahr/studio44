@@ -654,6 +654,19 @@ export default function Admin() {
             withPos={false}
           />
         </Section>
+
+        <Section title="Rodapé — endereço / CNPJ">
+          <p className="text-xs text-neutral-500 mb-3">
+            Barra fina no fim da página (altura máx. 50px). Use Enter para uma
+            segunda linha e a posição para alinhar à esquerda, centro ou direita.
+          </p>
+          <TextEditor
+            label="Texto do rodapé"
+            value={c.footer}
+            onChange={(v) => up({ footer: v })}
+            withPos={true}
+          />
+        </Section>
       </main>
     </div>
   );

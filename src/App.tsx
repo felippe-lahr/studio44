@@ -1036,6 +1036,31 @@ function WhatsAppFab() {
   );
 }
 
+/** Barra fina de rodapé com endereço / CNPJ (altura máx. 50px). */
+function Footer() {
+  const c = useContent();
+  const isMobile = useIsMobile();
+  const f = pickField(c.footer, isMobile);
+  const align =
+    f.pos?.h === 'left'
+      ? 'justify-start text-left'
+      : f.pos?.h === 'right'
+        ? 'justify-end text-right'
+        : 'justify-center text-center';
+  return (
+    <footer
+      className={`w-full h-[50px] flex items-center ${align} px-4 md:px-6 bg-neutral-100 border-t border-neutral-200 overflow-hidden`}
+    >
+      <p
+        className="text-xs md:text-sm text-neutral-600 leading-tight whitespace-pre-line"
+        style={tStyle(f)}
+      >
+        <Lines text={f.text} />
+      </p>
+    </footer>
+  );
+}
+
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const handleComplete = useCallback(() => setShowSplash(false), []);
@@ -1047,6 +1072,7 @@ export default function App() {
       <Section1 ready={!showSplash} />
       <Section2 ready={!showSplash} />
       <Section3 ready={!showSplash} />
+      <Footer />
       <WhatsAppFab />
     </div>
   );
