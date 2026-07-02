@@ -138,12 +138,14 @@ export const useContent = () => useContext(ContentContext);
 
 /** Estilo inline de tamanho/peso (só aplica o que estiver definido). */
 export function tStyle(f: TextField): CSSProperties {
-  const s: CSSProperties = {};
-  if (f.size) s.fontSize = f.size;
+  const s: Record<string, string | number> = {};
+  // O tamanho vira uma variável CSS aplicada só no desktop (ver index.css),
+  // para não estourar no mobile (que mantém o tamanho responsivo padrão).
+  if (f.size) s['--s44-fs'] = f.size;
   if (f.weight) s.fontWeight = f.weight;
   if (f.lh) s.lineHeight = f.lh;
   if (f.color) s.color = f.color;
-  return s;
+  return s as CSSProperties;
 }
 
 /** URL do CSS da Google Font escolhida (pesos 400–800). */
