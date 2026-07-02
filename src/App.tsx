@@ -7,7 +7,14 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
-import { useContent, tStyle, posClasses, heroPosClasses, multiline } from './content';
+import {
+  useContent,
+  tStyle,
+  multiline,
+  type TextField,
+  type PosH,
+  type PosV,
+} from './content';
 
 /** Renderiza um texto (com \n → <br/>). */
 function Lines({ text }: { text: string }) {
@@ -19,6 +26,61 @@ function Lines({ text }: { text: string }) {
           {br && <br />}
         </span>
       ))}
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * ZONE TEXTS — posiciona vários textos num card por zonas (topo/centro/
+ * base). Textos na mesma zona EMPILHAM (não se sobrepõem).
+ * ------------------------------------------------------------------ */
+type ZoneText = { field: TextField; className: string; style?: CSSProperties };
+
+const V_ORDER: PosV[] = ['top', 'center', 'bottom'];
+
+function ZoneTexts({ texts, hero = false }: { texts: ZoneText[]; hero?: boolean }) {
+  const inset = hero
+    ? 'left-4 right-4 md:left-8 md:right-8'
+    : 'left-5 right-5 md:left-7 md:right-7';
+  const zoneV = (v: PosV) =>
+    v === 'center'
+      ? 'top-1/2 -translate-y-1/2'
+      : v === 'bottom'
+        ? hero
+          ? 'bottom-6 md:bottom-10'
+          : 'bottom-4 md:bottom-6'
+        : hero
+          ? 'top-24 md:top-28'
+          : 'top-4 md:top-6';
+  const alignH = (h: PosH) =>
+    h === 'center'
+      ? 'items-center text-center'
+      : h === 'right'
+        ? 'items-end text-right'
+        : 'items-start text-left';
+
+  return (
+    <>
+      {V_ORDER.map((v) => {
+        const group = texts.filter((t) => (t.field.pos?.v ?? 'top') === v);
+        if (!group.length) return null;
+        return (
+          <div
+            key={v}
+            className={`absolute ${inset} z-10 flex flex-col gap-2 md:gap-3 ${zoneV(v)}`}
+          >
+            {group.map((t, i) => (
+              <div
+                key={i}
+                style={{ ...tStyle(t.field), ...(t.style || {}) }}
+                className={`${alignH(t.field.pos?.h ?? 'left')} ${t.className}`}
+              >
+                <Lines text={t.field.text} />
+              </div>
+            ))}
+          </div>
+        );
+      })}
     </>
   );
 }
@@ -582,24 +644,24 @@ function Section1({ ready }: { ready: boolean }) {
       </div>
 
       {/* Conteúdo por cima, com vidro fosco atrás de cada texto */}
-      <div className="absolute inset-0 z-10 px-4 md:px-8">
-        <div className={`${heroPosClasses(c.hero.paragraph.pos)} max-w-[240px] md:max-w-[360px]`}>
-          <p
-            style={{ ...s1Reveal.getAnimStyle(0), ...tStyle(c.hero.paragraph) }}
-            className="text-white text-sm md:text-base font-semibold leading-5 md:leading-6 backdrop-blur-md bg-black/35 rounded-lg px-4 py-3"
-          >
-            <Lines text={c.hero.paragraph.text} />
-          </p>
-        </div>
-
-        <div className={`${heroPosClasses(c.hero.headline.pos)} max-w-[92%]`}>
-          <h1
-            style={{ ...s1Reveal.getAnimStyle(1), ...tStyle(c.hero.headline) }}
-            className="text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.82] tracking-tight backdrop-blur-md bg-black/35 rounded-2xl px-4 py-3 md:px-6 md:py-4"
-          >
-            <Lines text={c.hero.headline.text} />
-          </h1>
-        </div>
+      <div className="absolute inset-0 z-10">
+        <ZoneTexts
+          hero
+          texts={[
+            {
+              field: c.hero.paragraph,
+              style: s1Reveal.getAnimStyle(0),
+              className:
+                'max-w-[240px] md:max-w-[360px] text-white text-sm md:text-base font-semibold leading-5 md:leading-6 backdrop-blur-md bg-black/35 rounded-lg px-4 py-3',
+            },
+            {
+              field: c.hero.headline,
+              style: s1Reveal.getAnimStyle(1),
+              className:
+                'max-w-[92%] text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.82] tracking-tight backdrop-blur-md bg-black/35 rounded-2xl px-4 py-3 md:px-6 md:py-4',
+            },
+          ]}
+        />
       </div>
 
       {/* Seta animada — rola para a Seção 2 */}
@@ -661,18 +723,18 @@ function Section2({ ready }: { ready: boolean }) {
           style={s2Reveal.getAnimStyle(0)}
           className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
         >
-          <h2
-            style={tStyle(c.section2.title)}
-            className={`${posClasses(c.section2.title.pos)} text-white md:text-black text-2xl md:text-3xl font-bold z-10`}
-          >
-            <Lines text={c.section2.title.text} />
-          </h2>
-          <p
-            style={tStyle(c.section2.subtitle)}
-            className={`${posClasses(c.section2.subtitle.pos)} text-white md:text-black text-xs md:text-sm font-semibold z-10 max-w-[70%]`}
-          >
-            <Lines text={c.section2.subtitle.text} />
-          </p>
+          <ZoneTexts
+            texts={[
+              {
+                field: c.section2.title,
+                className: 'text-white md:text-black text-2xl md:text-3xl font-bold',
+              },
+              {
+                field: c.section2.subtitle,
+                className: 'text-white md:text-black text-xs md:text-sm font-semibold',
+              },
+            ]}
+          />
         </MaskedCard>
 
         {/* Card 1 — Top Right (spans 2 rows on desktop) */}
@@ -711,12 +773,14 @@ function Section2({ ready }: { ready: boolean }) {
           style={s2Reveal.getAnimStyle(2)}
           className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
         >
-          <h2
-            style={tStyle(c.section2.solutions)}
-            className={`${posClasses(c.section2.solutions.pos)} text-white md:text-black text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.9] z-10`}
-          >
-            <Lines text={c.section2.solutions.text} />
-          </h2>
+          <ZoneTexts
+            texts={[
+              {
+                field: c.section2.solutions,
+                className: 'text-white md:text-black text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.9]',
+              },
+            ]}
+          />
         </MaskedCard>
 
         {/* Card 3 — Bottom Full Width (Services) */}
