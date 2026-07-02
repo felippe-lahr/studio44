@@ -337,6 +337,23 @@ export default function Admin() {
             onChange={(v) => up({ logo: v })}
             token={token}
           />
+
+          <label className="block text-sm font-semibold text-neutral-700 mb-1">
+            Transparência do cabeçalho — {c.headerOpacity ?? 80}% opaco
+          </label>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-xs text-neutral-500">transparente</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={c.headerOpacity ?? 80}
+              onChange={(e) => up({ headerOpacity: Number(e.target.value) })}
+              className="flex-1"
+            />
+            <span className="text-xs text-neutral-500">sólido</span>
+          </div>
+
           <label className="block text-sm font-semibold text-neutral-700 mb-1">
             Link de contato (WhatsApp / e-mail)
           </label>

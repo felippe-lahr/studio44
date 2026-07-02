@@ -46,6 +46,8 @@ export const GOOGLE_FONTS = [
 export type Content = {
   /** nome de uma Google Font (ver GOOGLE_FONTS). Vazio = fonte padrão. */
   font?: string;
+  /** opacidade do fundo do cabeçalho (0–100). Padrão 80. */
+  headerOpacity?: number;
   logo: string;
   contactHref: string;
   hero: {
@@ -71,6 +73,7 @@ export type Content = {
 };
 
 export const DEFAULT_CONTENT: Content = {
+  headerOpacity: 80,
   logo: '/logo-studio44-3.svg',
   contactHref: 'https://wa.me/5599999999999',
   hero: {
