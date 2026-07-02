@@ -33,7 +33,12 @@ export type TextField = TextStyle & {
   mobile?: TextStyle;
 };
 
-export type Service = { name: string; num: string | null };
+export type Service = TextStyle & {
+  name: string;
+  num: string | null;
+  /** overrides de estilo só para mobile (< 768px). */
+  mobile?: TextStyle;
+};
 
 /** Fontes do Google (todas com pesos 400–800). */
 export const GOOGLE_FONTS = [
@@ -171,6 +176,24 @@ export function pickField(f: TextField, isMobile: boolean): TextField {
   const m = f.mobile;
   return {
     text: f.text,
+    size: m.size, // não herda o desktop (evita estourar no mobile)
+    weight: m.weight ?? f.weight,
+    lh: m.lh ?? f.lh,
+    color: m.color ?? f.color,
+    pos: m.pos ?? f.pos,
+  };
+}
+
+/** Resolve o estilo de um elemento com overrides de mobile (ex.: serviços).
+ *  Desktop = base; mobile aplica seus overrides (tamanho independente, o
+ *  resto herda do desktop) — mesma regra do `pickField`. */
+export function pickStyle(
+  f: TextStyle & { mobile?: TextStyle },
+  isMobile: boolean,
+): TextStyle {
+  if (!isMobile || !f.mobile) return f;
+  const m = f.mobile;
+  return {
     size: m.size, // não herda o desktop (evita estourar no mobile)
     weight: m.weight ?? f.weight,
     lh: m.lh ?? f.lh,

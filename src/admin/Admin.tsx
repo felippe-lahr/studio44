@@ -8,6 +8,7 @@ import {
   type PosV,
   type TextField,
   type TextStyle,
+  type Service,
 } from '../content';
 
 const TOKEN_KEY = 's44_token';
@@ -532,31 +533,59 @@ export default function Admin() {
           <label className="block text-sm font-semibold text-neutral-700 mb-1">
             Serviços (nome — use Enter p/ quebrar linha — e número)
           </label>
-          {c.section2.services.map((svc, i) => (
-            <div key={i} className="flex gap-2 mb-2">
-              <textarea
-                value={svc.name}
-                rows={2}
-                onChange={(e) => {
-                  const services = [...c.section2.services];
-                  services[i] = { ...svc, name: e.target.value };
-                  up({ section2: { ...c.section2, services } });
-                }}
-                className="flex-1 text-sm border border-neutral-300 rounded px-2 py-1.5"
-              />
-              <input
-                type="text"
-                value={svc.num ?? ''}
-                placeholder="nº"
-                onChange={(e) => {
-                  const services = [...c.section2.services];
-                  services[i] = { ...svc, num: e.target.value || null };
-                  up({ section2: { ...c.section2, services } });
-                }}
-                className="w-16 text-sm border border-neutral-300 rounded px-2 py-1.5"
-              />
-            </div>
-          ))}
+          {c.section2.services.map((svc, i) => {
+            const setSvc = (patch: Partial<Service>) => {
+              const services = [...c.section2.services];
+              services[i] = { ...svc, ...patch };
+              up({ section2: { ...c.section2, services } });
+            };
+            const setBase = (patch: Partial<TextStyle>) => setSvc(patch as Partial<Service>);
+            const setMobile = (patch: Partial<TextStyle>) =>
+              setSvc({ mobile: { ...(svc.mobile ?? {}), ...patch } });
+            return (
+              <div
+                key={i}
+                className="mb-4 p-3 rounded-lg border border-neutral-200 bg-neutral-50"
+              >
+                <div className="flex gap-2 mb-3">
+                  <textarea
+                    value={svc.name}
+                    rows={2}
+                    onChange={(e) => setSvc({ name: e.target.value })}
+                    className="flex-1 text-sm border border-neutral-300 rounded px-2 py-1.5"
+                  />
+                  <input
+                    type="text"
+                    value={svc.num ?? ''}
+                    placeholder="nº"
+                    onChange={(e) => setSvc({ num: e.target.value || null })}
+                    className="w-16 text-sm border border-neutral-300 rounded px-2 py-1.5"
+                  />
+                </div>
+
+                <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wide mb-1">
+                  🖥️ Desktop
+                </div>
+                <StyleControls style={svc} onChange={setBase} withPos={false} />
+
+                <div className="mt-3 mb-1 flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wide">
+                    📱 Mobile
+                  </span>
+                  {svc.mobile && Object.keys(svc.mobile).length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setSvc({ mobile: undefined })}
+                      className="text-[10px] text-neutral-500 underline"
+                    >
+                      limpar mobile
+                    </button>
+                  )}
+                </div>
+                <StyleControls style={svc.mobile ?? {}} onChange={setMobile} withPos={false} />
+              </div>
+            );
+          })}
         </Section>
 
         <Section title="Seção 3 — Soluções com IA">

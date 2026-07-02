@@ -11,6 +11,7 @@ import {
   useContent,
   tStyle,
   pickField,
+  pickStyle,
   multiline,
   type TextField,
   type PosH,
@@ -816,7 +817,7 @@ function Section2({ ready }: { ready: boolean }) {
           style={s2Reveal.getAnimStyle(3)}
           className="col-span-1 md:col-span-2 rounded-[var(--s44-radius,1rem)] overflow-hidden relative min-h-[200px] md:min-h-0"
         >
-          <div className="absolute inset-0 z-10 grid grid-cols-2 grid-rows-2 gap-[var(--s44-gap,0.5rem)] p-2 md:p-3">
+          <div className="absolute inset-0 z-10 grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-1 gap-[var(--s44-gap,0.5rem)] p-2 md:p-3">
             {c.section2.services.map((svc, i) => {
               const active = i === 0;
               return (
@@ -830,6 +831,7 @@ function Section2({ ready }: { ready: boolean }) {
                     className={`text-xl md:text-4xl font-bold leading-[1.05] whitespace-pre-line ${
                       active ? 'text-black' : 'text-white'
                     }`}
+                    style={tStyle(pickStyle(svc, isMobile))}
                   >
                     {svc.name}
                   </h3>
