@@ -87,6 +87,11 @@ export type Content = {
     img1: string;
     img2: string;
     bg: string;
+    consultLabel: TextField;
+    consultTitle: TextField;
+    consultButton: string;
+    overlay1: TextField;
+    overlay2: TextField;
   };
 };
 
@@ -135,6 +140,11 @@ export const DEFAULT_CONTENT: Content = {
     img1: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1000&auto=format&fit=crop',
     img2: '/uprocrm-card.jpg',
     bg: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1200&auto=format&fit=crop',
+    consultLabel: { text: 'Consultoria' },
+    consultTitle: { text: 'Estratégia\nDigital\nCompleta' },
+    consultButton: 'Agende uma Conversa',
+    overlay1: { text: 'Do Projeto\nà Entrega,\ncom Método' },
+    overlay2: { text: 'Suporte\ne Evolução\nContínua' },
   },
 };
 

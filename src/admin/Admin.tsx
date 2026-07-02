@@ -590,6 +590,40 @@ export default function Admin() {
             onChange={(v) => up({ section3: { ...c.section3, bg: v } })}
             token={token}
           />
+
+          <TextEditor
+            label="Card Consultoria — rótulo"
+            value={c.section3.consultLabel}
+            onChange={(v) => up({ section3: { ...c.section3, consultLabel: v } })}
+            withPos={false}
+          />
+          <TextEditor
+            label="Card Consultoria — título"
+            value={c.section3.consultTitle}
+            onChange={(v) => up({ section3: { ...c.section3, consultTitle: v } })}
+            withPos={false}
+          />
+          <label className="block text-sm font-semibold text-neutral-700 mb-1">
+            Card Consultoria — botão
+          </label>
+          <input
+            type="text"
+            value={c.section3.consultButton}
+            onChange={(e) => up({ section3: { ...c.section3, consultButton: e.target.value } })}
+            className="w-full text-sm border border-neutral-300 rounded px-2 py-1.5 mb-4"
+          />
+          <TextEditor
+            label="Card sobreposto 1 (branco)"
+            value={c.section3.overlay1}
+            onChange={(v) => up({ section3: { ...c.section3, overlay1: v } })}
+            withPos={false}
+          />
+          <TextEditor
+            label="Card sobreposto 2 (vidro)"
+            value={c.section3.overlay2}
+            onChange={(v) => up({ section3: { ...c.section3, overlay2: v } })}
+            withPos={false}
+          />
         </Section>
       </main>
     </div>

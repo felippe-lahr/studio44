@@ -91,12 +91,14 @@ function ZoneTexts({ texts, hero = false }: { texts: ZoneText[]; hero?: boolean 
         : hero
           ? 'top-24 md:top-28'
           : 'top-4 md:top-6';
+  // self-* (align-self) no item: o bloco abraça o texto (+ padding) em vez de
+  // esticar na largura toda do card.
   const alignH = (h: PosH) =>
     h === 'center'
-      ? 'items-center text-center'
+      ? 'self-center text-center'
       : h === 'right'
-        ? 'items-end text-right'
-        : 'items-start text-left';
+        ? 'self-end text-right'
+        : 'self-start text-left';
 
   return (
     <>
@@ -934,20 +936,24 @@ function Section3({ ready }: { ready: boolean }) {
             className="rounded-[var(--s44-radius,1rem)] bg-zinc-200 p-5 md:p-7 flex items-end justify-between flex-[0.8] min-h-[160px] md:min-h-0"
           >
             <div>
-              <p className="text-xs md:text-sm font-semibold text-black mb-2 md:mb-3">Consultoria</p>
-              <h3 className="text-xl md:text-3xl font-bold text-black leading-6 md:leading-8">
-                Estratégia
-                <br />
-                Digital
-                <br />
-                Completa
+              <p
+                style={tStyle(pickField(c.section3.consultLabel, isMobile))}
+                className="text-xs md:text-sm font-semibold text-black mb-2 md:mb-3"
+              >
+                <Lines text={c.section3.consultLabel.text} />
+              </p>
+              <h3
+                style={tStyle(pickField(c.section3.consultTitle, isMobile))}
+                className="text-xl md:text-3xl font-bold text-black leading-6 md:leading-8"
+              >
+                <Lines text={c.section3.consultTitle.text} />
               </h3>
             </div>
             <a
               href={c.contactHref}
               className="px-5 py-3 md:px-8 md:py-5 bg-white rounded-full text-black text-base md:text-xl font-bold hover:scale-105 transition-transform whitespace-nowrap"
             >
-              Agende uma Conversa
+              {c.section3.consultButton}
             </a>
           </div>
         </div>
@@ -965,12 +971,11 @@ function Section3({ ready }: { ready: boolean }) {
           <div className="absolute bottom-3 left-3 right-3 md:bottom-5 md:left-5 md:right-5 flex gap-[var(--s44-gap,0.5rem)]">
             {/* Overlay Card 1 (white) */}
             <div className="flex-1 bg-white rounded-[var(--s44-radius,1rem)] p-[var(--s44-inner-pad,1.25rem)] flex flex-col justify-between h-36 md:h-52">
-              <h4 className="text-lg md:text-2xl font-bold text-black leading-5 md:leading-7">
-                Do Projeto
-                <br />
-                à Entrega,
-                <br />
-                com Método
+              <h4
+                style={tStyle(pickField(c.section3.overlay1, isMobile))}
+                className="text-lg md:text-2xl font-bold text-black leading-5 md:leading-7"
+              >
+                <Lines text={c.section3.overlay1.text} />
               </h4>
               <span className="self-end w-9 h-9 md:w-12 md:h-12 rounded-full border border-black flex items-center justify-center">
                 <ArrowIcon />
@@ -979,12 +984,11 @@ function Section3({ ready }: { ready: boolean }) {
 
             {/* Overlay Card 2 (glass) */}
             <div className="flex-1 bg-white/20 backdrop-blur-xl rounded-[var(--s44-radius,1rem)] p-[var(--s44-inner-pad,1.25rem)] flex flex-col justify-between h-36 md:h-52">
-              <h4 className="text-lg md:text-2xl font-bold text-white leading-5 md:leading-7">
-                Suporte
-                <br />
-                e Evolução
-                <br />
-                Contínua
+              <h4
+                style={tStyle(pickField(c.section3.overlay2, isMobile))}
+                className="text-lg md:text-2xl font-bold text-white leading-5 md:leading-7"
+              >
+                <Lines text={c.section3.overlay2.text} />
               </h4>
               <span className="self-end w-9 h-9 md:w-12 md:h-12 rounded-full border border-white flex items-center justify-center text-white">
                 <ArrowIcon className="text-white" />
