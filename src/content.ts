@@ -17,13 +17,35 @@ export type TextField = {
   size?: string;
   /** peso da fonte: 400..800. Vazio = padrão. */
   weight?: number;
+  /** altura da linha, ex.: "1.2" ou "0.9". Vazio = padrão. */
+  lh?: string;
+  /** cor da fonte (hex). Vazio = padrão. */
+  color?: string;
   /** posição dentro do card. */
   pos?: { h: PosH; v: PosV };
 };
 
 export type Service = { name: string; num: string | null };
 
+/** Fontes do Google (todas com pesos 400–800). */
+export const GOOGLE_FONTS = [
+  'Inter',
+  'Poppins',
+  'Montserrat',
+  'Raleway',
+  'Manrope',
+  'DM Sans',
+  'Plus Jakarta Sans',
+  'Outfit',
+  'Work Sans',
+  'Archivo',
+  'Nunito',
+  'Figtree',
+];
+
 export type Content = {
+  /** nome de uma Google Font (ver GOOGLE_FONTS). Vazio = fonte padrão. */
+  font?: string;
   logo: string;
   contactHref: string;
   hero: {
@@ -101,7 +123,14 @@ export function tStyle(f: TextField): CSSProperties {
   const s: CSSProperties = {};
   if (f.size) s.fontSize = f.size;
   if (f.weight) s.fontWeight = f.weight;
+  if (f.lh) s.lineHeight = f.lh;
+  if (f.color) s.color = f.color;
   return s;
+}
+
+/** URL do CSS da Google Font escolhida (pesos 400–800). */
+export function googleFontHref(font: string): string {
+  return `https://fonts.googleapis.com/css2?family=${font.replace(/ /g, '+')}:wght@400;500;600;700;800&display=swap`;
 }
 
 /** Classes de posicionamento absoluto dentro de um card `relative`. */

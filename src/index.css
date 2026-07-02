@@ -11,7 +11,7 @@
     padding: 0;
   }
   body {
-    font-family: 'Open Sauce One', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--s44-font, 'Open Sauce One', -apple-system, BlinkMacSystemFont, sans-serif);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

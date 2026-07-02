@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   DEFAULT_CONTENT,
+  GOOGLE_FONTS,
   mergeContent,
   type Content,
   type PosH,
@@ -132,6 +133,34 @@ function TextEditor({
             <option value="700">Bold</option>
             <option value="800">Extrabold</option>
           </select>
+        </label>
+        <label className="flex items-center gap-1">
+          Altura da linha
+          <input
+            type="text"
+            value={value.lh ?? ''}
+            onChange={(e) => set({ lh: e.target.value || undefined })}
+            placeholder="auto"
+            className="w-16 border border-neutral-300 rounded px-1.5 py-1"
+          />
+        </label>
+        <label className="flex items-center gap-1">
+          Cor
+          <input
+            type="color"
+            value={value.color ?? '#000000'}
+            onChange={(e) => set({ color: e.target.value })}
+            className="w-8 h-7 border border-neutral-300 rounded p-0.5 bg-white"
+          />
+          {value.color && (
+            <button
+              type="button"
+              onClick={() => set({ color: undefined })}
+              className="text-[10px] text-neutral-500 underline"
+            >
+              limpar
+            </button>
+          )}
         </label>
         {withPos && (
           <>
@@ -286,6 +315,22 @@ export default function Admin() {
 
       <main className="max-w-2xl mx-auto p-4 md:p-6">
         <Section title="Geral">
+          <label className="block text-sm font-semibold text-neutral-700 mb-1">
+            Fonte do projeto (Google Fonts)
+          </label>
+          <select
+            value={c.font ?? ''}
+            onChange={(e) => up({ font: e.target.value || undefined })}
+            className="w-full text-sm border border-neutral-300 rounded px-2 py-1.5 mb-4"
+          >
+            <option value="">Open Sauce One (padrão)</option>
+            {GOOGLE_FONTS.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+
           <ImageField
             label="Logo"
             value={c.logo}
