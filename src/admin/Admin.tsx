@@ -7,6 +7,7 @@ import {
   type PosH,
   type PosV,
   type TextField,
+  type TextStyle,
 } from '../content';
 
 const TOKEN_KEY = 's44_token';
@@ -84,6 +85,103 @@ function ImageField({
   );
 }
 
+function StyleControls({
+  style,
+  onChange,
+  withPos,
+}: {
+  style: TextStyle;
+  onChange: (patch: Partial<TextStyle>) => void;
+  withPos: boolean;
+}) {
+  const pos = style.pos ?? { h: 'left', v: 'top' };
+  return (
+    <div className="flex flex-wrap gap-3 text-xs">
+      <label className="flex items-center gap-1">
+        Tamanho
+        <input
+          type="text"
+          value={style.size ?? ''}
+          onChange={(e) => onChange({ size: e.target.value || undefined })}
+          placeholder="auto"
+          className="w-20 border border-neutral-300 rounded px-1.5 py-1"
+        />
+      </label>
+      <label className="flex items-center gap-1">
+        Peso
+        <select
+          value={style.weight ?? ''}
+          onChange={(e) => onChange({ weight: e.target.value ? Number(e.target.value) : undefined })}
+          className="border border-neutral-300 rounded px-1.5 py-1"
+        >
+          <option value="">auto</option>
+          <option value="400">Normal</option>
+          <option value="500">Médio</option>
+          <option value="600">Semibold</option>
+          <option value="700">Bold</option>
+          <option value="800">Extrabold</option>
+        </select>
+      </label>
+      <label className="flex items-center gap-1">
+        Altura da linha
+        <input
+          type="text"
+          value={style.lh ?? ''}
+          onChange={(e) => onChange({ lh: e.target.value || undefined })}
+          placeholder="auto"
+          className="w-16 border border-neutral-300 rounded px-1.5 py-1"
+        />
+      </label>
+      <label className="flex items-center gap-1">
+        Cor
+        <input
+          type="color"
+          value={style.color ?? '#000000'}
+          onChange={(e) => onChange({ color: e.target.value })}
+          className="w-8 h-7 border border-neutral-300 rounded p-0.5 bg-white"
+        />
+        {style.color && (
+          <button
+            type="button"
+            onClick={() => onChange({ color: undefined })}
+            className="text-[10px] text-neutral-500 underline"
+          >
+            limpar
+          </button>
+        )}
+      </label>
+      {withPos && (
+        <>
+          <label className="flex items-center gap-1">
+            Horizontal
+            <select
+              value={pos.h}
+              onChange={(e) => onChange({ pos: { ...pos, h: e.target.value as PosH } })}
+              className="border border-neutral-300 rounded px-1.5 py-1"
+            >
+              <option value="left">Esquerda</option>
+              <option value="center">Centro</option>
+              <option value="right">Direita</option>
+            </select>
+          </label>
+          <label className="flex items-center gap-1">
+            Vertical
+            <select
+              value={pos.v}
+              onChange={(e) => onChange({ pos: { ...pos, v: e.target.value as PosV } })}
+              className="border border-neutral-300 rounded px-1.5 py-1"
+            >
+              <option value="top">Topo</option>
+              <option value="center">Centro</option>
+              <option value="bottom">Base</option>
+            </select>
+          </label>
+        </>
+      )}
+    </div>
+  );
+}
+
 function TextEditor({
   label,
   value,
@@ -95,102 +193,41 @@ function TextEditor({
   onChange: (v: TextField) => void;
   withPos?: boolean;
 }) {
-  const set = (patch: Partial<TextField>) => onChange({ ...value, ...patch });
-  const pos = value.pos ?? { h: 'left', v: 'top' };
+  const setBase = (patch: Partial<TextStyle>) => onChange({ ...value, ...patch });
+  const setMobile = (patch: Partial<TextStyle>) =>
+    onChange({ ...value, mobile: { ...(value.mobile ?? {}), ...patch } });
 
   return (
     <div className="mb-4 p-3 rounded-lg border border-neutral-200 bg-neutral-50">
       <label className="block text-sm font-semibold text-neutral-700 mb-1">{label}</label>
       <textarea
         value={value.text}
-        onChange={(e) => set({ text: e.target.value })}
+        onChange={(e) => onChange({ ...value, text: e.target.value })}
         rows={2}
-        className="w-full text-sm border border-neutral-300 rounded px-2 py-1.5 mb-2"
+        className="w-full text-sm border border-neutral-300 rounded px-2 py-1.5 mb-3"
         placeholder="Use Enter para quebrar linha"
       />
-      <div className="flex flex-wrap gap-3 text-xs">
-        <label className="flex items-center gap-1">
-          Tamanho
-          <input
-            type="text"
-            value={value.size ?? ''}
-            onChange={(e) => set({ size: e.target.value || undefined })}
-            placeholder="auto"
-            className="w-20 border border-neutral-300 rounded px-1.5 py-1"
-          />
-        </label>
-        <label className="flex items-center gap-1">
-          Peso
-          <select
-            value={value.weight ?? ''}
-            onChange={(e) => set({ weight: e.target.value ? Number(e.target.value) : undefined })}
-            className="border border-neutral-300 rounded px-1.5 py-1"
+
+      <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wide mb-1">
+        🖥️ Desktop
+      </div>
+      <StyleControls style={value} onChange={setBase} withPos={withPos} />
+
+      <div className="mt-3 mb-1 flex items-center gap-2">
+        <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wide">
+          📱 Mobile
+        </span>
+        {value.mobile && Object.keys(value.mobile).length > 0 && (
+          <button
+            type="button"
+            onClick={() => onChange({ ...value, mobile: undefined })}
+            className="text-[10px] text-neutral-500 underline"
           >
-            <option value="">auto</option>
-            <option value="400">Normal</option>
-            <option value="500">Médio</option>
-            <option value="600">Semibold</option>
-            <option value="700">Bold</option>
-            <option value="800">Extrabold</option>
-          </select>
-        </label>
-        <label className="flex items-center gap-1">
-          Altura da linha
-          <input
-            type="text"
-            value={value.lh ?? ''}
-            onChange={(e) => set({ lh: e.target.value || undefined })}
-            placeholder="auto"
-            className="w-16 border border-neutral-300 rounded px-1.5 py-1"
-          />
-        </label>
-        <label className="flex items-center gap-1">
-          Cor
-          <input
-            type="color"
-            value={value.color ?? '#000000'}
-            onChange={(e) => set({ color: e.target.value })}
-            className="w-8 h-7 border border-neutral-300 rounded p-0.5 bg-white"
-          />
-          {value.color && (
-            <button
-              type="button"
-              onClick={() => set({ color: undefined })}
-              className="text-[10px] text-neutral-500 underline"
-            >
-              limpar
-            </button>
-          )}
-        </label>
-        {withPos && (
-          <>
-            <label className="flex items-center gap-1">
-              Horizontal
-              <select
-                value={pos.h}
-                onChange={(e) => set({ pos: { ...pos, h: e.target.value as PosH } })}
-                className="border border-neutral-300 rounded px-1.5 py-1"
-              >
-                <option value="left">Esquerda</option>
-                <option value="center">Centro</option>
-                <option value="right">Direita</option>
-              </select>
-            </label>
-            <label className="flex items-center gap-1">
-              Vertical
-              <select
-                value={pos.v}
-                onChange={(e) => set({ pos: { ...pos, v: e.target.value as PosV } })}
-                className="border border-neutral-300 rounded px-1.5 py-1"
-              >
-                <option value="top">Topo</option>
-                <option value="center">Centro</option>
-                <option value="bottom">Base</option>
-              </select>
-            </label>
-          </>
+            limpar mobile
+          </button>
         )}
       </div>
+      <StyleControls style={value.mobile ?? {}} onChange={setMobile} withPos={withPos} />
     </div>
   );
 }

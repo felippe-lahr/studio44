@@ -11,8 +11,8 @@ import {
 export type PosH = 'left' | 'center' | 'right';
 export type PosV = 'top' | 'center' | 'bottom';
 
-export type TextField = {
-  text: string;
+/** Propriedades de estilo de um texto (por dispositivo). */
+export type TextStyle = {
   /** override de tamanho da fonte, ex.: "48px" ou "3rem". Vazio = padrão. */
   size?: string;
   /** peso da fonte: 400..800. Vazio = padrão. */
@@ -23,6 +23,14 @@ export type TextField = {
   color?: string;
   /** posição dentro do card. */
   pos?: { h: PosH; v: PosV };
+};
+
+export type TextField = TextStyle & {
+  text: string;
+  /** overrides só para mobile (< 768px). O que não for definido aqui:
+   *  - tamanho: usa o tamanho responsivo padrão (não herda o desktop);
+   *  - demais (peso/cor/altura/posição): herdam do desktop. */
+  mobile?: TextStyle;
 };
 
 export type Service = { name: string; num: string | null };
@@ -137,15 +145,28 @@ export const ContentContext = createContext<Content>(DEFAULT_CONTENT);
 export const useContent = () => useContext(ContentContext);
 
 /** Estilo inline de tamanho/peso (só aplica o que estiver definido). */
-export function tStyle(f: TextField): CSSProperties {
-  const s: Record<string, string | number> = {};
-  // O tamanho vira uma variável CSS aplicada só no desktop (ver index.css),
-  // para não estourar no mobile (que mantém o tamanho responsivo padrão).
-  if (f.size) s['--s44-fs'] = f.size;
+export function tStyle(f: TextStyle): CSSProperties {
+  const s: CSSProperties = {};
+  if (f.size) s.fontSize = f.size;
   if (f.weight) s.fontWeight = f.weight;
   if (f.lh) s.lineHeight = f.lh;
   if (f.color) s.color = f.color;
-  return s as CSSProperties;
+  return s;
+}
+
+/** Resolve o campo para o dispositivo atual (desktop = base; mobile aplica
+ *  seus overrides — tamanho independente, o resto herda do desktop). */
+export function pickField(f: TextField, isMobile: boolean): TextField {
+  if (!isMobile || !f.mobile) return f;
+  const m = f.mobile;
+  return {
+    text: f.text,
+    size: m.size, // não herda o desktop (evita estourar no mobile)
+    weight: m.weight ?? f.weight,
+    lh: m.lh ?? f.lh,
+    color: m.color ?? f.color,
+    pos: m.pos ?? f.pos,
+  };
 }
 
 /** URL do CSS da Google Font escolhida (pesos 400–800). */

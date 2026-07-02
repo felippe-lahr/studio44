@@ -55,14 +55,6 @@
   }
 }
 
-/* Tamanho de fonte personalizado: só no desktop (mobile mantém o padrão
-   responsivo, para não estourar a largura em telas pequenas). */
-@media (min-width: 768px) {
-  [style*='--s44-fs'] {
-    font-size: var(--s44-fs) !important;
-  }
-}
-
 @keyframes s44-bounce {
   0%,
   100% {

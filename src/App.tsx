@@ -10,6 +10,7 @@ import {
 import {
   useContent,
   tStyle,
+  pickField,
   multiline,
   type TextField,
   type PosH,
@@ -669,6 +670,7 @@ function HeroCodeField() {
 
 function Section1({ ready }: { ready: boolean }) {
   const c = useContent();
+  const isMobile = useIsMobile();
   const s1Reveal = useStaggeredReveal(4, ready);
 
   return (
@@ -687,13 +689,13 @@ function Section1({ ready }: { ready: boolean }) {
           hero
           texts={[
             {
-              field: c.hero.paragraph,
+              field: pickField(c.hero.paragraph, isMobile),
               style: s1Reveal.getAnimStyle(0),
               className:
                 'max-w-[240px] md:max-w-[360px] text-white text-sm md:text-base font-semibold leading-5 md:leading-6 backdrop-blur-md bg-black/35 rounded-lg px-4 py-3',
             },
             {
-              field: c.hero.headline,
+              field: pickField(c.hero.headline, isMobile),
               style: s1Reveal.getAnimStyle(1),
               className:
                 'max-w-[92%] text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.82] tracking-tight backdrop-blur-md bg-black/35 rounded-2xl px-4 py-3 md:px-6 md:py-4',
@@ -744,11 +746,11 @@ function Section2({ ready }: { ready: boolean }) {
           <ZoneTexts
             texts={[
               {
-                field: c.section2.title,
+                field: pickField(c.section2.title, isMobile),
                 className: 'text-white md:text-black text-2xl md:text-3xl font-bold',
               },
               {
-                field: c.section2.subtitle,
+                field: pickField(c.section2.subtitle, isMobile),
                 className: 'text-white md:text-black text-xs md:text-sm font-semibold',
               },
             ]}
@@ -767,7 +769,7 @@ function Section2({ ready }: { ready: boolean }) {
           className="md:row-span-2 rounded-[var(--s44-radius,1rem)] overflow-hidden relative min-h-[200px] md:min-h-0"
         >
           <p
-            style={tStyle(c.section2.ctaText)}
+            style={tStyle(pickField(c.section2.ctaText, isMobile))}
             className="absolute bottom-16 left-5 md:bottom-20 md:left-7 text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 z-10"
           >
             <Lines text={c.section2.ctaText.text} />
@@ -794,7 +796,7 @@ function Section2({ ready }: { ready: boolean }) {
           <ZoneTexts
             texts={[
               {
-                field: c.section2.solutions,
+                field: pickField(c.section2.solutions, isMobile),
                 className: 'text-white md:text-black text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.9]',
               },
             ]}
@@ -874,6 +876,7 @@ function ArrowIcon({ className = '' }: { className?: string }) {
 
 function Section3({ ready }: { ready: boolean }) {
   const c = useContent();
+  const isMobile = useIsMobile();
   const s3Reveal = useStaggeredReveal(4, ready);
 
   return (
@@ -891,13 +894,13 @@ function Section3({ ready }: { ready: boolean }) {
             className="rounded-[var(--s44-radius,1rem)] bg-stone-50 p-5 md:p-7 flex flex-col justify-between flex-[1.2] min-h-[180px] md:min-h-0"
           >
             <h2
-              style={tStyle(c.section3.title)}
+              style={tStyle(pickField(c.section3.title, isMobile))}
               className="text-[clamp(3rem,7vw,6.5rem)] font-bold leading-[0.95] text-black"
             >
               <Lines text={c.section3.title.text} />
             </h2>
             <p
-              style={tStyle(c.section3.subtitle)}
+              style={tStyle(pickField(c.section3.subtitle, isMobile))}
               className="text-xs md:text-sm font-semibold text-black"
             >
               <Lines text={c.section3.subtitle.text} />
