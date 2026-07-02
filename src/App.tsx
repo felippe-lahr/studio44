@@ -408,7 +408,7 @@ function Navbar() {
           <img
             src={c.logo}
             alt="Studio44 — Consultoria Digital"
-            className="h-12 md:h-16 w-auto"
+            className="h-12 md:h-16 w-auto max-w-none shrink-0"
           />
         </a>
 
@@ -816,13 +816,13 @@ function Section2({ ready }: { ready: boolean }) {
           style={s2Reveal.getAnimStyle(3)}
           className="col-span-1 md:col-span-2 rounded-[var(--s44-radius,1rem)] overflow-hidden relative min-h-[200px] md:min-h-0"
         >
-          <div className="absolute inset-0 z-10 flex flex-wrap md:flex-nowrap gap-[var(--s44-gap,0.5rem)] p-2 md:p-3">
+          <div className="absolute inset-0 z-10 grid grid-cols-2 grid-rows-2 gap-[var(--s44-gap,0.5rem)] p-2 md:p-3">
             {c.section2.services.map((svc, i) => {
               const active = i === 0;
               return (
                 <div
                   key={i}
-                  className={`flex-1 min-w-[calc(50%-4px)] md:min-w-0 rounded-[var(--s44-radius,1rem)] p-[var(--s44-inner-pad,1.25rem)] flex flex-col justify-between ${
+                  className={`rounded-[var(--s44-radius,1rem)] p-[var(--s44-inner-pad,1.25rem)] flex flex-col justify-between ${
                     active ? 'bg-white/90 backdrop-blur-md' : 'bg-white/20 backdrop-blur-xl'
                   }`}
                 >
