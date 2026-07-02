@@ -478,8 +478,33 @@ export default function Admin() {
             type="text"
             value={c.contactHref}
             onChange={(e) => up({ contactHref: e.target.value })}
-            className="w-full text-sm border border-neutral-300 rounded px-2 py-1.5"
+            className="w-full text-sm border border-neutral-300 rounded px-2 py-1.5 mb-4"
           />
+
+          <label className="block text-sm font-semibold text-neutral-700 mb-1">
+            Cor do botão flutuante do WhatsApp
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              value={c.whatsappColor ?? '#25D366'}
+              onChange={(e) => up({ whatsappColor: e.target.value })}
+              className="w-10 h-8 border border-neutral-300 rounded p-0.5 bg-white"
+            />
+            <input
+              type="text"
+              value={c.whatsappColor ?? '#25D366'}
+              onChange={(e) => up({ whatsappColor: e.target.value })}
+              className="w-28 text-sm border border-neutral-300 rounded px-2 py-1.5"
+            />
+            <button
+              type="button"
+              onClick={() => up({ whatsappColor: '#25D366' })}
+              className="text-xs text-neutral-500 underline"
+            >
+              padrão
+            </button>
+          </div>
         </Section>
 
         <Section title="Hero">

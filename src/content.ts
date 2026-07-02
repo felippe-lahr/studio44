@@ -71,6 +71,8 @@ export type Content = {
   cardGap?: number;
   /** padding interno dos cards aninhados (subcards) em px. Padrão 20. */
   innerCardPadding?: number;
+  /** cor de fundo do botão flutuante do WhatsApp. Padrão '#25D366'. */
+  whatsappColor?: string;
   logo: string;
   contactHref: string;
   hero: {
@@ -109,6 +111,7 @@ export const DEFAULT_CONTENT: Content = {
   cardRadius: 16,
   cardGap: 8,
   innerCardPadding: 20,
+  whatsappColor: '#25D366',
   logo: '/logo-studio44-3.svg',
   contactHref: 'https://wa.me/5599999999999',
   hero: {

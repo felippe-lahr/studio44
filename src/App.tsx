@@ -1022,7 +1022,8 @@ function WhatsAppFab() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Fale conosco no WhatsApp"
-      className="fixed bottom-5 right-5 md:bottom-7 md:right-7 z-50 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#25D366] shadow-lg shadow-black/25 hover:scale-110 transition-transform duration-200"
+      style={{ backgroundColor: c.whatsappColor ?? '#25D366' }}
+      className="fixed bottom-5 right-5 md:bottom-7 md:right-7 z-50 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full shadow-lg shadow-black/25 hover:scale-110 transition-transform duration-200"
     >
       <svg
         viewBox="0 0 32 32"
