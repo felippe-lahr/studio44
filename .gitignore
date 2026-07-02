@@ -21,3 +21,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local CMS data (use a Railway volume in prod)
+/data

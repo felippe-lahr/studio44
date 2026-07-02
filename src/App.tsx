@@ -7,35 +7,21 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
+import { useContent, tStyle, posClasses, heroPosClasses, multiline } from './content';
 
-/* ------------------------------------------------------------------ *
- * IMAGE URLS
- * Imagens coesas, em alta resolução e na vertical/quadrada funcionam
- * melhor com a técnica de "masked cards" (Seções 1 e 2). Substitua
- * pelos seus próprios assets quando quiser.
- * ------------------------------------------------------------------ */
-const SECTION2_IMAGE = '/image-studio44-railway.jpg';
-const SECTION3_IMG1 =
-  'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1000&auto=format&fit=crop';
-const SECTION3_IMG2 = '/uprocrm-card.jpg';
-const SECTION3_BG =
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1200&auto=format&fit=crop';
-
-/* Canal de contato — substitua pelo seu WhatsApp, formulário ou e-mail. */
-const CONTACT_HREF = 'https://wa.me/5599999999999';
-
-/* ------------------------------------------------------------------ *
- * DATA CONSTANTS
- * ------------------------------------------------------------------ */
-
-type Service = { name: string; num: string | null; active: boolean };
-
-const services: Service[] = [
-  { name: 'Sites &\nWordPress', num: '01', active: true },
-  { name: 'Lojas\nE-commerce', num: '02', active: false },
-  { name: 'Marketing\nDigital', num: '03', active: false },
-  { name: 'Apps & IA\nsob medida', num: null, active: false },
-];
+/** Renderiza um texto (com \n → <br/>). */
+function Lines({ text }: { text: string }) {
+  return (
+    <>
+      {multiline(text).map(({ line, br }, i) => (
+        <span key={i}>
+          {line}
+          {br && <br />}
+        </span>
+      ))}
+    </>
+  );
+}
 
 /* ------------------------------------------------------------------ *
  * HELPERS
@@ -278,6 +264,7 @@ function SplashScreen({ onComplete }: { onComplete: () => void }) {
 const navLinks = ['Início', 'Serviços', 'Sobre', 'Portfólio', 'Contato'];
 
 function Navbar() {
+  const c = useContent();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -313,7 +300,7 @@ function Navbar() {
           className="flex justify-center items-center"
         >
           <img
-            src="/logo-studio44-3.svg"
+            src={c.logo}
             alt="Studio44 — Consultoria Digital"
             className="h-12 md:h-16 w-auto"
           />
@@ -402,7 +389,7 @@ function Navbar() {
             >
               <p className="text-sm font-semibold text-black mb-4">Resposta em 24h</p>
               <a
-                href={CONTACT_HREF}
+                href={c.contactHref}
                 className="block text-center w-full px-6 py-4 bg-black rounded-full text-white text-sm font-semibold hover:bg-neutral-800 transition-colors duration-200"
               >
                 Solicitar Orçamento
@@ -578,6 +565,7 @@ function HeroCodeField() {
 }
 
 function Section1({ ready }: { ready: boolean }) {
+  const c = useContent();
   const s1Reveal = useStaggeredReveal(4, ready);
 
   return (
@@ -591,24 +579,24 @@ function Section1({ ready }: { ready: boolean }) {
       </div>
 
       {/* Conteúdo por cima, com vidro fosco atrás de cada texto */}
-      <div className="relative z-10 h-full flex flex-col justify-between pt-24 md:pt-28 px-4 md:px-8 pb-6 md:pb-10">
-        <p
-          style={s1Reveal.getAnimStyle(0)}
-          className="self-start max-w-[240px] md:max-w-[360px] text-white text-sm md:text-base font-semibold leading-5 md:leading-6 backdrop-blur-md bg-black/35 rounded-lg px-4 py-3"
-        >
-          Transformamos pequenas e médias empresas
-          <br />
-          em referências digitais.
-        </p>
+      <div className="absolute inset-0 z-10 px-4 md:px-8">
+        <div className={`${heroPosClasses(c.hero.paragraph.pos)} max-w-[240px] md:max-w-[360px]`}>
+          <p
+            style={{ ...s1Reveal.getAnimStyle(0), ...tStyle(c.hero.paragraph) }}
+            className="text-white text-sm md:text-base font-semibold leading-5 md:leading-6 backdrop-blur-md bg-black/35 rounded-lg px-4 py-3"
+          >
+            <Lines text={c.hero.paragraph.text} />
+          </p>
+        </div>
 
-        <h1
-          style={s1Reveal.getAnimStyle(1)}
-          className="self-start text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.82] tracking-tight backdrop-blur-md bg-black/35 rounded-2xl px-4 py-3 md:px-6 md:py-4"
-        >
-          Cresça
-          <br />
-          no Digital
-        </h1>
+        <div className={`${heroPosClasses(c.hero.headline.pos)} max-w-[92%]`}>
+          <h1
+            style={{ ...s1Reveal.getAnimStyle(1), ...tStyle(c.hero.headline) }}
+            className="text-white text-[clamp(3rem,11vw,11rem)] font-bold leading-[0.82] tracking-tight backdrop-blur-md bg-black/35 rounded-2xl px-4 py-3 md:px-6 md:py-4"
+          >
+            <Lines text={c.hero.headline.text} />
+          </h1>
+        </div>
       </div>
 
       {/* Seta animada — rola para a Seção 2 */}
@@ -640,6 +628,7 @@ function Section1({ ready }: { ready: boolean }) {
  * SECTION 2 — SERVIÇOS / PORTFÓLIO
  * ------------------------------------------------------------------ */
 function Section2({ ready }: { ready: boolean }) {
+  const c = useContent();
   const isMobile = useIsMobile();
   const section2Ref = useRef<HTMLElement>(null);
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
@@ -648,7 +637,7 @@ function Section2({ ready }: { ready: boolean }) {
   const positions = useMaskPositions(section2Ref, cardRefs);
   const sectionWidth = positions[0]?.sw ?? 0;
   const sectionHeight = positions[0]?.sh ?? 0;
-  const { renderW, renderH } = useCoverImage(SECTION2_IMAGE, sectionWidth, sectionHeight);
+  const { renderW, renderH } = useCoverImage(c.section2.image, sectionWidth, sectionHeight);
   const focalX = isMobile ? 0.65 : 0.8;
 
   return (
@@ -660,7 +649,7 @@ function Section2({ ready }: { ready: boolean }) {
       <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[auto_auto_auto_auto] md:grid-rows-[1fr_1fr_0.8fr] gap-1.5 md:gap-2">
         {/* Card 0 — Top Left */}
         <MaskedCard
-          bgImage={SECTION2_IMAGE}
+          bgImage={c.section2.image}
           position={positions[0]}
           renderW={renderW}
           renderH={renderH}
@@ -669,17 +658,23 @@ function Section2({ ready }: { ready: boolean }) {
           style={s2Reveal.getAnimStyle(0)}
           className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
         >
-          <h2 className="absolute top-4 left-5 md:top-6 md:left-7 text-white md:text-black text-2xl md:text-3xl font-bold z-10">
-            Nossos Serviços
+          <h2
+            style={tStyle(c.section2.title)}
+            className={`${posClasses(c.section2.title.pos)} text-white md:text-black text-2xl md:text-3xl font-bold z-10`}
+          >
+            <Lines text={c.section2.title.text} />
           </h2>
-          <p className="absolute bottom-4 left-5 md:bottom-6 md:left-7 text-white md:text-black text-xs md:text-sm font-semibold z-10">
-            O que entregamos para o seu negócio
+          <p
+            style={tStyle(c.section2.subtitle)}
+            className={`${posClasses(c.section2.subtitle.pos)} text-white md:text-black text-xs md:text-sm font-semibold z-10 max-w-[70%]`}
+          >
+            <Lines text={c.section2.subtitle.text} />
           </p>
         </MaskedCard>
 
         {/* Card 1 — Top Right (spans 2 rows on desktop) */}
         <MaskedCard
-          bgImage={SECTION2_IMAGE}
+          bgImage={c.section2.image}
           position={positions[1]}
           renderW={renderW}
           renderH={renderH}
@@ -688,22 +683,23 @@ function Section2({ ready }: { ready: boolean }) {
           style={s2Reveal.getAnimStyle(1)}
           className="md:row-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
         >
-          <p className="absolute bottom-16 left-5 md:bottom-20 md:left-7 text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 z-10">
-            Quer escalar o seu negócio no digital?
-            <br />
-            Vamos conversar sobre o seu projeto.
+          <p
+            style={tStyle(c.section2.ctaText)}
+            className="absolute bottom-16 left-5 md:bottom-20 md:left-7 text-white text-xs md:text-sm font-semibold leading-4 md:leading-5 z-10"
+          >
+            <Lines text={c.section2.ctaText.text} />
           </p>
           <a
-            href={CONTACT_HREF}
+            href={c.contactHref}
             className="absolute bottom-4 right-4 md:bottom-6 md:right-6 px-5 py-3 md:px-8 md:py-5 bg-white rounded-full text-black text-base md:text-xl font-bold z-10 hover:scale-105 transition-transform"
           >
-            Fale Conosco
+            {c.section2.ctaButton}
           </a>
         </MaskedCard>
 
         {/* Card 2 — Bottom Left */}
         <MaskedCard
-          bgImage={SECTION2_IMAGE}
+          bgImage={c.section2.image}
           position={positions[2]}
           renderW={renderW}
           renderH={renderH}
@@ -712,16 +708,17 @@ function Section2({ ready }: { ready: boolean }) {
           style={s2Reveal.getAnimStyle(2)}
           className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
         >
-          <h2 className="absolute top-4 left-5 md:top-6 md:left-7 text-white md:text-black text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.9] z-10">
-            Soluções
-            <br />
-            Sob Medida
+          <h2
+            style={tStyle(c.section2.solutions)}
+            className={`${posClasses(c.section2.solutions.pos)} text-white md:text-black text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.9] z-10`}
+          >
+            <Lines text={c.section2.solutions.text} />
           </h2>
         </MaskedCard>
 
         {/* Card 3 — Bottom Full Width (Services) */}
         <MaskedCard
-          bgImage={SECTION2_IMAGE}
+          bgImage={c.section2.image}
           position={positions[3]}
           renderW={renderW}
           renderH={renderH}
@@ -731,31 +728,34 @@ function Section2({ ready }: { ready: boolean }) {
           className="col-span-1 md:col-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
         >
           <div className="absolute inset-0 z-10 flex flex-wrap md:flex-nowrap gap-1.5 md:gap-2 p-2 md:p-3">
-            {services.map((svc) => (
-              <div
-                key={svc.name}
-                className={`flex-1 min-w-[calc(50%-4px)] md:min-w-0 rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col justify-between ${
-                  svc.active ? 'bg-white/90 backdrop-blur-md' : 'bg-white/20 backdrop-blur-xl'
-                }`}
-              >
-                <h3
-                  className={`text-xl md:text-4xl font-bold leading-[1.05] whitespace-pre-line ${
-                    svc.active ? 'text-black' : 'text-white'
+            {c.section2.services.map((svc, i) => {
+              const active = i === 0;
+              return (
+                <div
+                  key={i}
+                  className={`flex-1 min-w-[calc(50%-4px)] md:min-w-0 rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col justify-between ${
+                    active ? 'bg-white/90 backdrop-blur-md' : 'bg-white/20 backdrop-blur-xl'
                   }`}
                 >
-                  {svc.name}
-                </h3>
-                {svc.num && (
-                  <span
-                    className={`self-end w-8 h-8 md:w-12 md:h-12 rounded-full border flex items-center justify-center text-xs md:text-sm font-semibold ${
-                      svc.active ? 'border-black text-black' : 'border-white text-white'
+                  <h3
+                    className={`text-xl md:text-4xl font-bold leading-[1.05] whitespace-pre-line ${
+                      active ? 'text-black' : 'text-white'
                     }`}
                   >
-                    {svc.num}
-                  </span>
-                )}
-              </div>
-            ))}
+                    {svc.name}
+                  </h3>
+                  {svc.num && (
+                    <span
+                      className={`self-end w-8 h-8 md:w-12 md:h-12 rounded-full border flex items-center justify-center text-xs md:text-sm font-semibold ${
+                        active ? 'border-black text-black' : 'border-white text-white'
+                      }`}
+                    >
+                      {svc.num}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </MaskedCard>
       </div>
@@ -787,6 +787,7 @@ function ArrowIcon({ className = '' }: { className?: string }) {
 }
 
 function Section3({ ready }: { ready: boolean }) {
+  const c = useContent();
   const s3Reveal = useStaggeredReveal(4, ready);
 
   return (
@@ -802,13 +803,17 @@ function Section3({ ready }: { ready: boolean }) {
             style={s3Reveal.getAnimStyle(0)}
             className="rounded-xl md:rounded-2xl bg-stone-50 p-5 md:p-7 flex flex-col justify-between flex-[1.2] min-h-[180px] md:min-h-0"
           >
-            <h2 className="text-[clamp(3rem,7vw,6.5rem)] font-bold leading-[0.95] text-black">
-              Soluções
-              <br />
-              com IA
+            <h2
+              style={tStyle(c.section3.title)}
+              className="text-[clamp(3rem,7vw,6.5rem)] font-bold leading-[0.95] text-black"
+            >
+              <Lines text={c.section3.title.text} />
             </h2>
-            <p className="text-xs md:text-sm font-semibold text-black">
-              Automação e inteligência para o seu negócio
+            <p
+              style={tStyle(c.section3.subtitle)}
+              className="text-xs md:text-sm font-semibold text-black"
+            >
+              <Lines text={c.section3.subtitle.text} />
             </p>
           </div>
 
@@ -819,14 +824,14 @@ function Section3({ ready }: { ready: boolean }) {
           >
             <div className="flex-1 rounded-xl md:rounded-2xl overflow-hidden">
               <img
-                src={SECTION3_IMG1}
+                src={c.section3.img1}
                 alt="Aplicativo desenvolvido pela Studio44"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex-1 rounded-xl md:rounded-2xl overflow-hidden">
               <img
-                src={SECTION3_IMG2}
+                src={c.section3.img2}
                 alt="Solução de IA e automação"
                 className="w-full h-full object-cover"
               />
@@ -849,7 +854,7 @@ function Section3({ ready }: { ready: boolean }) {
               </h3>
             </div>
             <a
-              href={CONTACT_HREF}
+              href={c.contactHref}
               className="px-5 py-3 md:px-8 md:py-5 bg-white rounded-full text-black text-base md:text-xl font-bold hover:scale-105 transition-transform whitespace-nowrap"
             >
               Agende uma Conversa
@@ -863,7 +868,7 @@ function Section3({ ready }: { ready: boolean }) {
           className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[350px] md:min-h-0"
         >
           <img
-            src={SECTION3_BG}
+            src={c.section3.bg}
             alt="Equipe Studio44"
             className="w-full h-full object-cover"
           />

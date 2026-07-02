@@ -7,16 +7,18 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "start": "serve -s dist -l ${PORT:-3000}",
+    "start": "node server/index.mjs",
+    "server": "node server/index.mjs",
     "lint": "tsc --noEmit"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "serve": "^14.2.4"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
