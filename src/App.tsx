@@ -30,13 +30,18 @@ function Lines({ text }: { text: string }) {
   );
 }
 
-/** Seta animada de rolagem (posição configurável: esquerda/centro/direita). */
-function ScrollArrow({ to }: { to: string }) {
-  const c = useContent();
-  const pos = c.arrowPos ?? 'center';
+/** Seta animada de rolagem (posição por seção; aponta pra cima na última). */
+function ScrollArrow({ to, pos, up = false }: { to: string; pos: PosH; up?: boolean }) {
   const place =
     pos === 'left' ? 'left-5 md:left-8' : pos === 'right' ? 'right-5 md:right-8' : 'left-1/2';
-  const anim = pos === 'center' ? 's44-bounce' : 's44-bounce-x';
+  const anim =
+    pos === 'center'
+      ? up
+        ? 's44-bounce-up'
+        : 's44-bounce'
+      : up
+        ? 's44-bounce-x-up'
+        : 's44-bounce-x';
   const go = () => {
     if (to === 'top') window.scrollTo({ top: 0, behavior: 'smooth' });
     else document.getElementById(to)?.scrollIntoView({ behavior: 'smooth' });
@@ -44,7 +49,7 @@ function ScrollArrow({ to }: { to: string }) {
   return (
     <button
       type="button"
-      aria-label="Rolar"
+      aria-label={up ? 'Voltar ao topo' : 'Rolar'}
       onClick={go}
       data-s44-bounce
       style={{ animation: `${anim} 1.8s ease-in-out infinite` }}
@@ -52,7 +57,7 @@ function ScrollArrow({ to }: { to: string }) {
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
         <path
-          d="M6 9l6 6 6-6"
+          d={up ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6'}
           stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
@@ -697,7 +702,7 @@ function Section1({ ready }: { ready: boolean }) {
         />
       </div>
 
-      <ScrollArrow to="servicos" />
+      <ScrollArrow to="servicos" pos={c.arrows?.s1 ?? 'center'} />
     </section>
   );
 }
@@ -813,7 +818,7 @@ function Section2({ ready }: { ready: boolean }) {
               return (
                 <div
                   key={i}
-                  className={`flex-1 min-w-[calc(50%-4px)] md:min-w-0 rounded-[var(--s44-radius,1rem)] p-3 md:p-5 flex flex-col justify-between ${
+                  className={`flex-1 min-w-[calc(50%-4px)] md:min-w-0 rounded-[var(--s44-radius,1rem)] p-[var(--s44-inner-pad,1.25rem)] flex flex-col justify-between ${
                     active ? 'bg-white/90 backdrop-blur-md' : 'bg-white/20 backdrop-blur-xl'
                   }`}
                 >
@@ -839,7 +844,7 @@ function Section2({ ready }: { ready: boolean }) {
           </div>
         </MaskedCard>
       </div>
-      <ScrollArrow to="solucoes" />
+      <ScrollArrow to="solucoes" pos={c.arrows?.s2 ?? 'center'} />
     </section>
   );
 }
@@ -956,7 +961,7 @@ function Section3({ ready }: { ready: boolean }) {
           />
           <div className="absolute bottom-3 left-3 right-3 md:bottom-5 md:left-5 md:right-5 flex gap-[var(--s44-gap,0.5rem)]">
             {/* Overlay Card 1 (white) */}
-            <div className="flex-1 bg-white rounded-[var(--s44-radius,1rem)] p-3 md:p-5 flex flex-col justify-between h-36 md:h-52">
+            <div className="flex-1 bg-white rounded-[var(--s44-radius,1rem)] p-[var(--s44-inner-pad,1.25rem)] flex flex-col justify-between h-36 md:h-52">
               <h4 className="text-lg md:text-2xl font-bold text-black leading-5 md:leading-7">
                 Do Projeto
                 <br />
@@ -970,7 +975,7 @@ function Section3({ ready }: { ready: boolean }) {
             </div>
 
             {/* Overlay Card 2 (glass) */}
-            <div className="flex-1 bg-white/20 backdrop-blur-xl rounded-[var(--s44-radius,1rem)] p-3 md:p-5 flex flex-col justify-between h-36 md:h-52">
+            <div className="flex-1 bg-white/20 backdrop-blur-xl rounded-[var(--s44-radius,1rem)] p-[var(--s44-inner-pad,1.25rem)] flex flex-col justify-between h-36 md:h-52">
               <h4 className="text-lg md:text-2xl font-bold text-white leading-5 md:leading-7">
                 Suporte
                 <br />
@@ -985,7 +990,7 @@ function Section3({ ready }: { ready: boolean }) {
           </div>
         </div>
       </div>
-      <ScrollArrow to="top" />
+      <ScrollArrow to="top" pos={c.arrows?.s3 ?? 'center'} up />
     </section>
   );
 }
@@ -998,7 +1003,7 @@ export default function App() {
   const handleComplete = useCallback(() => setShowSplash(false), []);
 
   return (
-    <div className="bg-white">
+    <div className="bg-white flex flex-col gap-[var(--s44-section-gap,0px)]">
       {showSplash && <SplashScreen onComplete={handleComplete} />}
       <Navbar />
       <Section1 ready={!showSplash} />

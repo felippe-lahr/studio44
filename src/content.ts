@@ -48,12 +48,16 @@ export type Content = {
   font?: string;
   /** opacidade do fundo do cabeçalho (0–100). Padrão 80. */
   headerOpacity?: number;
-  /** posição horizontal da seta de rolagem. Padrão 'center'. */
-  arrowPos?: PosH;
+  /** posição horizontal da seta de rolagem por seção. Padrão 'center'. */
+  arrows?: { s1: PosH; s2: PosH; s3: PosH };
+  /** margem (espaço) entre as seções em px. Padrão 0. */
+  sectionGap?: number;
   /** border-radius dos cards em px. Padrão 16. */
   cardRadius?: number;
   /** espaçamento (gap) entre os cards em px. Padrão 8. */
   cardGap?: number;
+  /** padding interno dos cards aninhados (subcards) em px. Padrão 20. */
+  innerCardPadding?: number;
   logo: string;
   contactHref: string;
   hero: {
@@ -80,9 +84,11 @@ export type Content = {
 
 export const DEFAULT_CONTENT: Content = {
   headerOpacity: 80,
-  arrowPos: 'center',
+  arrows: { s1: 'center', s2: 'center', s3: 'center' },
+  sectionGap: 0,
   cardRadius: 16,
   cardGap: 8,
+  innerCardPadding: 20,
   logo: '/logo-studio44-3.svg',
   contactHref: 'https://wa.me/5599999999999',
   hero: {

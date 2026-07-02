@@ -355,17 +355,47 @@ export default function Admin() {
           </div>
 
           <label className="block text-sm font-semibold text-neutral-700 mb-1">
-            Posição da seta de rolagem
+            Posição da seta de rolagem (por seção)
           </label>
-          <select
-            value={c.arrowPos ?? 'center'}
-            onChange={(e) => up({ arrowPos: e.target.value as PosH })}
-            className="w-full text-sm border border-neutral-300 rounded px-2 py-1.5 mb-4"
-          >
-            <option value="left">Esquerda</option>
-            <option value="center">Centro</option>
-            <option value="right">Direita</option>
-          </select>
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {(
+              [
+                ['s1', 'Hero'],
+                ['s2', 'Serviços'],
+                ['s3', 'Soluções (↑ topo)'],
+              ] as const
+            ).map(([key, label]) => {
+              const arrows = c.arrows ?? { s1: 'center', s2: 'center', s3: 'center' };
+              return (
+                <div key={key}>
+                  <span className="block text-[11px] text-neutral-500 mb-0.5">{label}</span>
+                  <select
+                    value={arrows[key]}
+                    onChange={(e) =>
+                      up({ arrows: { ...arrows, [key]: e.target.value as PosH } })
+                    }
+                    className="w-full text-sm border border-neutral-300 rounded px-1.5 py-1.5"
+                  >
+                    <option value="left">Esquerda</option>
+                    <option value="center">Centro</option>
+                    <option value="right">Direita</option>
+                  </select>
+                </div>
+              );
+            })}
+          </div>
+
+          <label className="block text-sm font-semibold text-neutral-700 mb-1">
+            Margem entre as seções — {c.sectionGap ?? 0}px
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={80}
+            value={c.sectionGap ?? 0}
+            onChange={(e) => up({ sectionGap: Number(e.target.value) })}
+            className="w-full mb-4"
+          />
 
           <label className="block text-sm font-semibold text-neutral-700 mb-1">
             Cantos dos cards (border-radius) — {c.cardRadius ?? 16}px
@@ -388,6 +418,18 @@ export default function Admin() {
             max={32}
             value={c.cardGap ?? 8}
             onChange={(e) => up({ cardGap: Number(e.target.value) })}
+            className="w-full mb-4"
+          />
+
+          <label className="block text-sm font-semibold text-neutral-700 mb-1">
+            Padding dos cards internos (subcards) — {c.innerCardPadding ?? 20}px
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={40}
+            value={c.innerCardPadding ?? 20}
+            onChange={(e) => up({ innerCardPadding: Number(e.target.value) })}
             className="w-full mb-4"
           />
 

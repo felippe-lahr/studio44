@@ -75,6 +75,26 @@
   }
 }
 
+@keyframes s44-bounce-up {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, -9px);
+  }
+}
+
+@keyframes s44-bounce-x-up {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-s44-code],
   [data-s44-scan],

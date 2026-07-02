@@ -40,12 +40,14 @@ function Site() {
     }
   }, [content.font]);
 
-  // Raio e espaçamento dos cards (variáveis CSS).
+  // Raio/espaçamento dos cards, margem entre seções e padding interno.
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty('--s44-radius', `${content.cardRadius ?? 16}px`);
     root.style.setProperty('--s44-gap', `${content.cardGap ?? 8}px`);
-  }, [content.cardRadius, content.cardGap]);
+    root.style.setProperty('--s44-section-gap', `${content.sectionGap ?? 0}px`);
+    root.style.setProperty('--s44-inner-pad', `${content.innerCardPadding ?? 20}px`);
+  }, [content.cardRadius, content.cardGap, content.sectionGap, content.innerCardPadding]);
 
   return (
     <ContentContext.Provider value={content}>
