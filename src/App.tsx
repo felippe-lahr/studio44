@@ -279,6 +279,7 @@ const navLinks = ['Início', 'Serviços', 'Sobre', 'Portfólio', 'Contato'];
 
 function Navbar() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (open) document.body.style.overflow = 'hidden';
@@ -288,11 +289,29 @@ function Navbar() {
     };
   }, [open]);
 
+  // Menu fica escondido no topo (hero) e aparece ao rolar.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Enquanto escondido, o menu não deve capturar cliques.
+  const menuVisible = scrolled || open;
+
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-6 py-2 md:py-3 bg-white/80 backdrop-blur-md">
-        {/* Logo */}
-        <a href="#" aria-label="Studio44 — Consultoria Digital" className="flex items-center">
+      <nav className="fixed top-0 left-0 right-0 z-50 grid grid-cols-3 items-center px-4 md:px-6 py-2 bg-white/80 backdrop-blur-md">
+        {/* Espaçador esquerdo */}
+        <div />
+
+        {/* Logo centralizado */}
+        <a
+          href="#"
+          aria-label="Studio44 — Consultoria Digital"
+          className="flex justify-center items-center"
+        >
           <img
             src="/logo-studio44-3.svg"
             alt="Studio44 — Consultoria Digital"
@@ -300,41 +319,45 @@ function Navbar() {
           />
         </a>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
+        {/* Menu (aparece ao rolar): botão desktop + hambúrguer mobile */}
+        <div
+          className={`flex justify-end items-center gap-6 transition-opacity duration-300 ${
+            menuVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+        >
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="px-6 py-3 bg-white rounded-full border border-black text-sm font-semibold hover:bg-black hover:text-white transition-colors duration-200"
+            className="hidden md:block px-6 py-3 bg-white rounded-full border border-black text-sm font-semibold hover:bg-black hover:text-white transition-colors duration-200"
           >
             Menu
           </button>
-        </div>
 
-        {/* Mobile hamburger */}
-        <button
-          type="button"
-          aria-label="Abrir menu"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="md:hidden w-10 h-10 flex items-center justify-center relative"
-        >
-          <span
-            className={`absolute h-0.5 w-6 bg-black rounded-full transition-all duration-300 ease-[cubic-bezier(0.76,0,0.24,1)] ${
-              open ? 'rotate-45 translate-y-0' : '-translate-y-2'
-            }`}
-          />
-          <span
-            className={`absolute h-0.5 w-6 bg-black rounded-full transition-all duration-300 ease-[cubic-bezier(0.76,0,0.24,1)] ${
-              open ? 'opacity-0 scale-x-0' : 'opacity-100 scale-x-100'
-            }`}
-          />
-          <span
-            className={`absolute h-0.5 w-6 bg-black rounded-full transition-all duration-300 ease-[cubic-bezier(0.76,0,0.24,1)] ${
-              open ? '-rotate-45 translate-y-0' : 'translate-y-2'
-            }`}
-          />
-        </button>
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            aria-label="Abrir menu"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="md:hidden w-10 h-10 flex items-center justify-center relative"
+          >
+            <span
+              className={`absolute h-0.5 w-6 bg-black rounded-full transition-all duration-300 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+                open ? 'rotate-45 translate-y-0' : '-translate-y-2'
+              }`}
+            />
+            <span
+              className={`absolute h-0.5 w-6 bg-black rounded-full transition-all duration-300 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+                open ? 'opacity-0 scale-x-0' : 'opacity-100 scale-x-100'
+              }`}
+            />
+            <span
+              className={`absolute h-0.5 w-6 bg-black rounded-full transition-all duration-300 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+                open ? '-rotate-45 translate-y-0' : 'translate-y-2'
+              }`}
+            />
+          </button>
+        </div>
       </nav>
 
       {/* Mobile menu overlay */}
@@ -587,6 +610,28 @@ function Section1({ ready }: { ready: boolean }) {
           no Digital
         </h1>
       </div>
+
+      {/* Seta animada — rola para a Seção 2 */}
+      <button
+        type="button"
+        aria-label="Rolar para baixo"
+        onClick={() =>
+          document.getElementById('servicos')?.scrollIntoView({ behavior: 'smooth' })
+        }
+        data-s44-bounce
+        style={{ animation: 's44-bounce 1.8s ease-in-out infinite' }}
+        className="absolute bottom-5 left-1/2 z-20 w-11 h-11 md:w-12 md:h-12 rounded-full border border-white/40 bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
     </section>
   );
 }
@@ -608,6 +653,7 @@ function Section2({ ready }: { ready: boolean }) {
 
   return (
     <section
+      id="servicos"
       ref={mergeRefs<HTMLElement>(section2Ref, s2Reveal.containerRef)}
       className="min-h-screen md:h-screen w-full overflow-hidden flex flex-col pt-1.5 md:pt-2 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
     >

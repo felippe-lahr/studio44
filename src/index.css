@@ -55,10 +55,21 @@
   }
 }
 
+@keyframes s44-bounce {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, 9px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-s44-code],
   [data-s44-scan],
-  [data-s44-caret] {
+  [data-s44-caret],
+  [data-s44-bounce] {
     animation: none !important;
   }
 }
