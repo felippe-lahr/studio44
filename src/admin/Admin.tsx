@@ -355,6 +355,43 @@ export default function Admin() {
           </div>
 
           <label className="block text-sm font-semibold text-neutral-700 mb-1">
+            Posição da seta de rolagem
+          </label>
+          <select
+            value={c.arrowPos ?? 'center'}
+            onChange={(e) => up({ arrowPos: e.target.value as PosH })}
+            className="w-full text-sm border border-neutral-300 rounded px-2 py-1.5 mb-4"
+          >
+            <option value="left">Esquerda</option>
+            <option value="center">Centro</option>
+            <option value="right">Direita</option>
+          </select>
+
+          <label className="block text-sm font-semibold text-neutral-700 mb-1">
+            Cantos dos cards (border-radius) — {c.cardRadius ?? 16}px
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={40}
+            value={c.cardRadius ?? 16}
+            onChange={(e) => up({ cardRadius: Number(e.target.value) })}
+            className="w-full mb-4"
+          />
+
+          <label className="block text-sm font-semibold text-neutral-700 mb-1">
+            Espaçamento entre os cards — {c.cardGap ?? 8}px
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={32}
+            value={c.cardGap ?? 8}
+            onChange={(e) => up({ cardGap: Number(e.target.value) })}
+            className="w-full mb-4"
+          />
+
+          <label className="block text-sm font-semibold text-neutral-700 mb-1">
             Link de contato (WhatsApp / e-mail)
           </label>
           <input

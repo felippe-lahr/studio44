@@ -48,6 +48,12 @@ export type Content = {
   font?: string;
   /** opacidade do fundo do cabeçalho (0–100). Padrão 80. */
   headerOpacity?: number;
+  /** posição horizontal da seta de rolagem. Padrão 'center'. */
+  arrowPos?: PosH;
+  /** border-radius dos cards em px. Padrão 16. */
+  cardRadius?: number;
+  /** espaçamento (gap) entre os cards em px. Padrão 8. */
+  cardGap?: number;
   logo: string;
   contactHref: string;
   hero: {
@@ -74,6 +80,9 @@ export type Content = {
 
 export const DEFAULT_CONTENT: Content = {
   headerOpacity: 80,
+  arrowPos: 'center',
+  cardRadius: 16,
+  cardGap: 8,
   logo: '/logo-studio44-3.svg',
   contactHref: 'https://wa.me/5599999999999',
   hero: {

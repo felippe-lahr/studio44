@@ -40,6 +40,13 @@ function Site() {
     }
   }, [content.font]);
 
+  // Raio e espaçamento dos cards (variáveis CSS).
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--s44-radius', `${content.cardRadius ?? 16}px`);
+    root.style.setProperty('--s44-gap', `${content.cardGap ?? 8}px`);
+  }, [content.cardRadius, content.cardGap]);
+
   return (
     <ContentContext.Provider value={content}>
       <App />
@@ -48,6 +55,10 @@ function Site() {
 }
 
 const isAdmin = window.location.pathname.replace(/\/+$/, '') === '/admin';
+
+// Ao recarregar, sempre começar no topo (Seção 1).
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+if (!isAdmin) window.scrollTo(0, 0);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>{isAdmin ? <Admin /> : <Site />}</StrictMode>,

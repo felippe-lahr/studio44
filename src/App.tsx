@@ -30,6 +30,39 @@ function Lines({ text }: { text: string }) {
   );
 }
 
+/** Seta animada de rolagem (posição configurável: esquerda/centro/direita). */
+function ScrollArrow({ to }: { to: string }) {
+  const c = useContent();
+  const pos = c.arrowPos ?? 'center';
+  const place =
+    pos === 'left' ? 'left-5 md:left-8' : pos === 'right' ? 'right-5 md:right-8' : 'left-1/2';
+  const anim = pos === 'center' ? 's44-bounce' : 's44-bounce-x';
+  const go = () => {
+    if (to === 'top') window.scrollTo({ top: 0, behavior: 'smooth' });
+    else document.getElementById(to)?.scrollIntoView({ behavior: 'smooth' });
+  };
+  return (
+    <button
+      type="button"
+      aria-label="Rolar"
+      onClick={go}
+      data-s44-bounce
+      style={{ animation: `${anim} 1.8s ease-in-out infinite` }}
+      className={`absolute bottom-5 ${place} z-30 w-11 h-11 md:w-12 md:h-12 rounded-full border border-white/40 bg-black/40 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/60 transition-colors`}
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M6 9l6 6 6-6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
 /* ------------------------------------------------------------------ *
  * ZONE TEXTS — posiciona vários textos num card por zonas (topo/centro/
  * base). Textos na mesma zona EMPILHAM (não se sobrepõem).
@@ -664,27 +697,7 @@ function Section1({ ready }: { ready: boolean }) {
         />
       </div>
 
-      {/* Seta animada — rola para a Seção 2 */}
-      <button
-        type="button"
-        aria-label="Rolar para baixo"
-        onClick={() =>
-          document.getElementById('servicos')?.scrollIntoView({ behavior: 'smooth' })
-        }
-        data-s44-bounce
-        style={{ animation: 's44-bounce 1.8s ease-in-out infinite' }}
-        className="absolute bottom-5 left-1/2 z-20 w-11 h-11 md:w-12 md:h-12 rounded-full border border-white/40 bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M6 9l6 6 6-6"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
+      <ScrollArrow to="servicos" />
     </section>
   );
 }
@@ -709,9 +722,9 @@ function Section2({ ready }: { ready: boolean }) {
     <section
       id="servicos"
       ref={mergeRefs<HTMLElement>(section2Ref, s2Reveal.containerRef)}
-      className="min-h-screen md:h-screen w-full overflow-hidden flex flex-col pt-1.5 md:pt-2 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
+      className="relative min-h-screen md:h-screen w-full overflow-hidden flex flex-col pt-1.5 md:pt-2 px-3 md:px-5 pb-1.5 md:pb-2 gap-[var(--s44-gap,0.5rem)]"
     >
-      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[auto_auto_auto_auto] md:grid-rows-[1fr_1fr_0.8fr] gap-1.5 md:gap-2">
+      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 grid-rows-[auto_auto_auto_auto] md:grid-rows-[1fr_1fr_0.8fr] gap-[var(--s44-gap,0.5rem)]">
         {/* Card 0 — Top Left */}
         <MaskedCard
           bgImage={c.section2.image}
@@ -721,7 +734,7 @@ function Section2({ ready }: { ready: boolean }) {
           focalX={focalX}
           cardRef={(el) => (cardRefs.current[0] = el)}
           style={s2Reveal.getAnimStyle(0)}
-          className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
+          className="rounded-[var(--s44-radius,1rem)] overflow-hidden relative min-h-[160px] md:min-h-0"
         >
           <ZoneTexts
             texts={[
@@ -746,7 +759,7 @@ function Section2({ ready }: { ready: boolean }) {
           focalX={focalX}
           cardRef={(el) => (cardRefs.current[1] = el)}
           style={s2Reveal.getAnimStyle(1)}
-          className="md:row-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
+          className="md:row-span-2 rounded-[var(--s44-radius,1rem)] overflow-hidden relative min-h-[200px] md:min-h-0"
         >
           <p
             style={tStyle(c.section2.ctaText)}
@@ -771,7 +784,7 @@ function Section2({ ready }: { ready: boolean }) {
           focalX={focalX}
           cardRef={(el) => (cardRefs.current[2] = el)}
           style={s2Reveal.getAnimStyle(2)}
-          className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[160px] md:min-h-0"
+          className="rounded-[var(--s44-radius,1rem)] overflow-hidden relative min-h-[160px] md:min-h-0"
         >
           <ZoneTexts
             texts={[
@@ -792,15 +805,15 @@ function Section2({ ready }: { ready: boolean }) {
           focalX={focalX}
           cardRef={(el) => (cardRefs.current[3] = el)}
           style={s2Reveal.getAnimStyle(3)}
-          className="col-span-1 md:col-span-2 rounded-xl md:rounded-2xl overflow-hidden relative min-h-[200px] md:min-h-0"
+          className="col-span-1 md:col-span-2 rounded-[var(--s44-radius,1rem)] overflow-hidden relative min-h-[200px] md:min-h-0"
         >
-          <div className="absolute inset-0 z-10 flex flex-wrap md:flex-nowrap gap-1.5 md:gap-2 p-2 md:p-3">
+          <div className="absolute inset-0 z-10 flex flex-wrap md:flex-nowrap gap-[var(--s44-gap,0.5rem)] p-2 md:p-3">
             {c.section2.services.map((svc, i) => {
               const active = i === 0;
               return (
                 <div
                   key={i}
-                  className={`flex-1 min-w-[calc(50%-4px)] md:min-w-0 rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col justify-between ${
+                  className={`flex-1 min-w-[calc(50%-4px)] md:min-w-0 rounded-[var(--s44-radius,1rem)] p-3 md:p-5 flex flex-col justify-between ${
                     active ? 'bg-white/90 backdrop-blur-md' : 'bg-white/20 backdrop-blur-xl'
                   }`}
                 >
@@ -826,6 +839,7 @@ function Section2({ ready }: { ready: boolean }) {
           </div>
         </MaskedCard>
       </div>
+      <ScrollArrow to="solucoes" />
     </section>
   );
 }
@@ -859,16 +873,17 @@ function Section3({ ready }: { ready: boolean }) {
 
   return (
     <section
+      id="solucoes"
       ref={s3Reveal.containerRef as Ref<HTMLElement>}
-      className="min-h-screen md:h-screen w-full overflow-hidden flex flex-col pt-1.5 md:pt-2 px-3 md:px-5 pb-1.5 md:pb-2 gap-1.5 md:gap-2"
+      className="relative min-h-screen md:h-screen w-full overflow-hidden flex flex-col pt-1.5 md:pt-2 px-3 md:px-5 pb-1.5 md:pb-2 gap-[var(--s44-gap,0.5rem)]"
     >
-      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-1.5 md:gap-2">
+      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-[var(--s44-gap,0.5rem)]">
         {/* LEFT COLUMN */}
-        <div className="flex flex-col gap-1.5 md:gap-2">
+        <div className="flex flex-col gap-[var(--s44-gap,0.5rem)]">
           {/* 1. Heading Card */}
           <div
             style={s3Reveal.getAnimStyle(0)}
-            className="rounded-xl md:rounded-2xl bg-stone-50 p-5 md:p-7 flex flex-col justify-between flex-[1.2] min-h-[180px] md:min-h-0"
+            className="rounded-[var(--s44-radius,1rem)] bg-stone-50 p-5 md:p-7 flex flex-col justify-between flex-[1.2] min-h-[180px] md:min-h-0"
           >
             <h2
               style={tStyle(c.section3.title)}
@@ -887,16 +902,16 @@ function Section3({ ready }: { ready: boolean }) {
           {/* 2. Two Image Cards */}
           <div
             style={s3Reveal.getAnimStyle(1)}
-            className="flex gap-1.5 md:gap-2 flex-1 min-h-[140px] md:min-h-0"
+            className="flex gap-[var(--s44-gap,0.5rem)] flex-1 min-h-[140px] md:min-h-0"
           >
-            <div className="flex-1 rounded-xl md:rounded-2xl overflow-hidden">
+            <div className="flex-1 rounded-[var(--s44-radius,1rem)] overflow-hidden">
               <img
                 src={c.section3.img1}
                 alt="Aplicativo desenvolvido pela Studio44"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="flex-1 rounded-xl md:rounded-2xl overflow-hidden">
+            <div className="flex-1 rounded-[var(--s44-radius,1rem)] overflow-hidden">
               <img
                 src={c.section3.img2}
                 alt="Solução de IA e automação"
@@ -908,7 +923,7 @@ function Section3({ ready }: { ready: boolean }) {
           {/* 3. Consultation Card */}
           <div
             style={s3Reveal.getAnimStyle(2)}
-            className="rounded-xl md:rounded-2xl bg-zinc-200 p-5 md:p-7 flex items-end justify-between flex-[0.8] min-h-[160px] md:min-h-0"
+            className="rounded-[var(--s44-radius,1rem)] bg-zinc-200 p-5 md:p-7 flex items-end justify-between flex-[0.8] min-h-[160px] md:min-h-0"
           >
             <div>
               <p className="text-xs md:text-sm font-semibold text-black mb-2 md:mb-3">Consultoria</p>
@@ -932,16 +947,16 @@ function Section3({ ready }: { ready: boolean }) {
         {/* RIGHT COLUMN */}
         <div
           style={s3Reveal.getAnimStyle(3)}
-          className="rounded-xl md:rounded-2xl overflow-hidden relative min-h-[350px] md:min-h-0"
+          className="rounded-[var(--s44-radius,1rem)] overflow-hidden relative min-h-[350px] md:min-h-0"
         >
           <img
             src={c.section3.bg}
             alt="Equipe Studio44"
             className="w-full h-full object-cover"
           />
-          <div className="absolute bottom-3 left-3 right-3 md:bottom-5 md:left-5 md:right-5 flex gap-1.5 md:gap-2">
+          <div className="absolute bottom-3 left-3 right-3 md:bottom-5 md:left-5 md:right-5 flex gap-[var(--s44-gap,0.5rem)]">
             {/* Overlay Card 1 (white) */}
-            <div className="flex-1 bg-white rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col justify-between h-36 md:h-52">
+            <div className="flex-1 bg-white rounded-[var(--s44-radius,1rem)] p-3 md:p-5 flex flex-col justify-between h-36 md:h-52">
               <h4 className="text-lg md:text-2xl font-bold text-black leading-5 md:leading-7">
                 Do Projeto
                 <br />
@@ -955,7 +970,7 @@ function Section3({ ready }: { ready: boolean }) {
             </div>
 
             {/* Overlay Card 2 (glass) */}
-            <div className="flex-1 bg-white/20 backdrop-blur-xl rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col justify-between h-36 md:h-52">
+            <div className="flex-1 bg-white/20 backdrop-blur-xl rounded-[var(--s44-radius,1rem)] p-3 md:p-5 flex flex-col justify-between h-36 md:h-52">
               <h4 className="text-lg md:text-2xl font-bold text-white leading-5 md:leading-7">
                 Suporte
                 <br />
@@ -970,6 +985,7 @@ function Section3({ ready }: { ready: boolean }) {
           </div>
         </div>
       </div>
+      <ScrollArrow to="top" />
     </section>
   );
 }
