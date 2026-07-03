@@ -413,10 +413,11 @@ function Navbar() {
           />
         </a>
 
-        {/* Menu (aparece ao rolar): botão desktop + hambúrguer mobile */}
+        {/* Menu (aparece ao rolar): botão desktop + hambúrguer mobile.
+            Só é exibido quando habilitado no painel (c.menuEnabled). */}
         <div
           className={`flex justify-end items-center gap-6 transition-opacity duration-300 ${
-            menuVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            c.menuEnabled && menuVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         >
           <button

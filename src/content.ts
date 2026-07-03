@@ -71,6 +71,8 @@ export type Content = {
   cardGap?: number;
   /** padding interno dos cards aninhados (subcards) em px. Padrão 20. */
   innerCardPadding?: number;
+  /** exibe o menu de navegação (botão "Menu" / hambúrguer). Padrão false. */
+  menuEnabled?: boolean;
   /** cor de fundo do botão flutuante do WhatsApp. Padrão '#25D366'. */
   whatsappColor?: string;
   logo: string;
@@ -111,6 +113,7 @@ export const DEFAULT_CONTENT: Content = {
   cardRadius: 16,
   cardGap: 8,
   innerCardPadding: 20,
+  menuEnabled: false,
   whatsappColor: '#25D366',
   logo: '/logo-studio44-3.svg',
   contactHref: 'https://wa.me/5599999999999',
